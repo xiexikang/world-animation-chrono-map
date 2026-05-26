@@ -1,7 +1,13 @@
 import { Canvas } from '@react-three/fiber'
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { buildNodeLatLngMap, getCountryGlobeCenter } from '@/globe/countryRegions'
+import { MAX_GLOBE_MARKERS } from '@/constants/performance'
+import {
+  buildNodeLatLngMap,
+  getCountryGlobeCenter,
+  resolveNodeLatLng,
+} from '@/globe/countryRegions'
+import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
 import type { LatLng } from '@/globe/geo'
 import {
   applyGlobeView,
@@ -38,10 +44,20 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
   const defaultViewApplied = useRef(false)
   const initialCamera = getGlobeCameraPosition(CHINA_GLOBE_CENTER)
 
+  const globeNodes = useMemo(
+    () => pickGlobeNodes(nodes, visibleSet, focusedId),
+    [nodes, visibleSet, focusedId],
+  )
+
   useEffect(() => {
+    if (globeNodes.length === 0) {
+      setLatLngMap(new Map())
+      setGeoReady(true)
+      return
+    }
     let cancelled = false
     setGeoReady(false)
-    void buildNodeLatLngMap(nodes).then((map) => {
+    void buildNodeLatLngMap(globeNodes).then((map) => {
       if (!cancelled) {
         setLatLngMap(map)
         setGeoReady(true)
@@ -50,12 +66,16 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
     return () => {
       cancelled = true
     }
-  }, [nodes])
+  }, [globeNodes])
 
   useEffect(() => {
-    if (nodes.length === 0) return
-    void preloadCoverTextures(nodes.map((n) => n.cover), 24, 0)
-  }, [nodes])
+    if (globeNodes.length === 0) return
+    void preloadCoverTextures(
+      globeNodes.map((n) => n.cover),
+      12,
+      40,
+    )
+  }, [globeNodes])
 
   useEffect(() => {
     const focus = (id: string) => {
@@ -67,12 +87,28 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
         store.toggleCountry(node.country)
       }
 
-      const latLng = latLngMap?.get(nodeId)
       const controls = sceneRef.current?.controls
       const camera = cameraRef.current
-      if (latLng && controls && camera) {
-        focusGlobeOnLatLng(camera, controls, latLng)
+
+      const focusAt = (latLng: LatLng) => {
+        if (controls && camera) focusGlobeOnLatLng(camera, controls, latLng)
       }
+
+      const cached = latLngMap?.get(nodeId)
+      if (cached) {
+        focusAt(cached)
+      } else if (node) {
+        void resolveNodeLatLng(node, latLngMap ?? new Map()).then((pt) => {
+          if (!pt) return
+          setLatLngMap((prev) => {
+            const next = new Map(prev ?? [])
+            next.set(nodeId, pt)
+            return next
+          })
+          focusAt(pt)
+        })
+      }
+
       store.setFocusedId(nodeId)
       store.setDetailCard(nodeId)
     }
@@ -142,8 +178,11 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
   return (
     <div className="relative h-full w-full bg-[#010208]">
       {!geoReady || !latLngMap ? (
-        <div className="flex h-full items-center justify-center text-sm text-text-muted">
-          正在按各国版图分布节点…
+        <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-text-muted">
+          <span>正在布置地球标记…</span>
+          <span className="text-xs text-text-muted/70">
+            最多 {MAX_GLOBE_MARKERS} 个海报点
+          </span>
         </div>
       ) : (
         <Canvas
@@ -166,7 +205,7 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
           <Suspense fallback={null}>
             <GlobeScene
               ref={sceneRef}
-              nodes={nodes}
+              nodes={globeNodes}
               latLngMap={latLngMap}
               visibleSet={visibleSet}
               focusedId={focusedId}
@@ -175,8 +214,11 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
           </Suspense>
         </Canvas>
       )}
-      <p className="pointer-events-none fixed bottom-24 left-1/2 z-10 -translate-x-1/2 text-xs text-text-muted/80 max-md:bottom-[11rem]">
-        拖拽旋转 · 节点落在各国版图内
+      <p className="pointer-events-none fixed bottom-24 left-1/2 z-10 max-w-[min(90vw,28rem)] -translate-x-1/2 text-center text-xs text-text-muted/80 max-md:bottom-[11rem]">
+        拖拽旋转 · 地球展示热度最高的 {Math.min(globeNodes.length, MAX_GLOBE_MARKERS)} 部
+        {nodes.length > MAX_GLOBE_MARKERS
+          ? `（共 ${nodes.length} 部，完整列表见右侧面板）`
+          : ''}
       </p>
     </div>
   )

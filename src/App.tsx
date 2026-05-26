@@ -8,8 +8,8 @@ import { ThemeDrawer, ThemeDrawerTrigger } from '@/components/ThemeDrawer'
 import { Timeline } from '@/components/Timeline'
 import { TopBar } from '@/components/TopBar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { loadAnimationNodes } from '@/lib/loadAnimationData'
 import { useAppStore } from '@/store'
-import type { AnimationNode } from '@/types'
 
 function App() {
   const allNodes = useAppStore((s) => s.allNodes)
@@ -20,10 +20,9 @@ function App() {
   const isTablet = useMediaQuery('(min-width: 768px)')
 
   useEffect(() => {
-    fetch('/data/nodes.json')
-      .then((res) => res.json())
-      .then((data: AnimationNode[]) => setNodes(data))
-      .catch((err) => console.error('Failed to load nodes:', err))
+    loadAnimationNodes()
+      .then(setNodes)
+      .catch((err) => console.error('加载 animationData 失败:', err))
   }, [setNodes])
 
   useEffect(() => {
@@ -39,7 +38,7 @@ function App() {
       <div className="fixed inset-0 z-0">
         {!nodesLoaded ? (
           <div className="flex h-full items-center justify-center text-sm text-text-muted">
-            加载世界地图…
+            加载动画数据…
           </div>
         ) : (
           <GlobeWrapper nodes={allNodes} />

@@ -274,7 +274,7 @@ function spreadNodesInCountry(
   const n = sorted.length
   if (n === 0) return new Map()
 
-  const seed = `${sorted[0]?.country ?? 'X'}-${sorted.map((node) => node.id).join('|')}`
+  const seed = `${sorted[0]?.country ?? 'X'}-${n}-${sorted[0]?.id ?? ''}-${sorted[n - 1]?.id ?? ''}`
   let pool = buildCandidatePool(polys, n, seed)
   const rng = seededRng(`${seed}:fps`)
   const [minLng, minLat, maxLng, maxLat] = combinedBbox(polys)
@@ -367,6 +367,30 @@ export async function buildNodeLatLngMap(
   }
 
   return result
+}
+
+/** 单部作品快速落点（面板选中但不在地球批次内时使用） */
+export async function resolveNodeLatLng(
+  node: AnimationNode,
+  cache: Map<string, LatLng>,
+): Promise<LatLng | null> {
+  const cached = cache.get(node.id)
+  if (cached) return cached
+
+  const regions = await loadCountryRegions()
+  const polys = regions.get(node.country)
+  if (!polys?.length) return null
+
+  const rng = seededRng(`single:${node.id}`)
+  for (let attempt = 0; attempt < 80; attempt++) {
+    const poly = polys[Math.floor(rng() * polys.length)]!
+    const pt = randomPointInPolygon(poly, rng)
+    if (pt) {
+      cache.set(node.id, pt)
+      return pt
+    }
+  }
+  return null
 }
 
 /** 国界轮廓（每国取外环，欧洲仅绘主要国家以保持性能） */

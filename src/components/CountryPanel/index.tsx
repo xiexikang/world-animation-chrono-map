@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   COUNTRY_LABELS,
   COUNTRY_NODE_COLORS,
   FILTER_COUNTRIES,
 } from '@/constants'
+import { PANEL_NODES_PAGE_SIZE } from '@/constants/performance'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
 import { resolveCoverUrl } from '@/lib/coverUrl'
@@ -45,6 +46,7 @@ export function CountryPanel() {
   const detailCardId = useAppStore((s) => s.detailCardId)
   const visibleSet = useVisibleSet()
   const [query, setQuery] = useState('')
+  const [listLimit, setListLimit] = useState(PANEL_NODES_PAGE_SIZE)
 
   const selected = countries[0] ?? null
   const q = query.trim().toLowerCase()
@@ -70,6 +72,15 @@ export function CountryPanel() {
     )
     return sortNodesByDate(filtered)
   }, [allNodes, selected, visibleSet, q])
+
+  useEffect(() => {
+    setListLimit(PANEL_NODES_PAGE_SIZE)
+  }, [selected, q, visibleSet])
+
+  const displayNodes = useMemo(
+    () => countryNodes.slice(0, listLimit),
+    [countryNodes, listLimit],
+  )
 
   const filteredCountries = useMemo(() => {
     return FILTER_COUNTRIES.filter((code) => {
@@ -138,16 +149,31 @@ export function CountryPanel() {
                 暂无匹配作品
               </p>
             ) : (
-              <div className="grid grid-cols-3 gap-2.5">
-                {countryNodes.map((node) => (
-                  <NodeGridItem
-                    key={node.id}
-                    node={node}
-                    active={String(detailCardId) === String(node.id)}
-                    onSelect={() => focusNode(node.id)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {displayNodes.map((node) => (
+                    <NodeGridItem
+                      key={node.id}
+                      node={node}
+                      active={String(detailCardId) === String(node.id)}
+                      onSelect={() => focusNode(node.id)}
+                    />
+                  ))}
+                </div>
+                {countryNodes.length > listLimit && (
+                  <button
+                    type="button"
+                    className="mt-3 w-full rounded-lg border border-white/10 py-2 text-xs text-text-muted transition hover:border-accent/40 hover:text-text"
+                    onClick={() =>
+                      setListLimit((n) =>
+                        Math.min(n + PANEL_NODES_PAGE_SIZE, countryNodes.length),
+                      )
+                    }
+                  >
+                    加载更多（已显示 {listLimit} / {countryNodes.length}）
+                  </button>
+                )}
+              </>
             )}
           </div>
         </>

@@ -1,11 +1,17 @@
+import { MAX_GLOBE_MARKERS } from '@/constants/performance'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
+import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
 import { useAppStore } from '@/store'
 import { SearchBox } from './SearchBox'
 
 export function TopBar() {
   const total = useAppStore((s) => s.allNodes.length)
-  const visible = useVisibleSet().size
+  const allNodes = useAppStore((s) => s.allNodes)
+  const focusedId = useAppStore((s) => s.focusedId)
+  const visibleSet = useVisibleSet()
+  const visible = visibleSet.size
+  const onGlobe = pickGlobeNodes(allNodes, visibleSet, focusedId).length
 
   return (
     <header className="float-panel fixed top-3 right-3 left-3 z-30 flex h-11 items-center gap-4 px-4 md:left-4 md:right-4">
@@ -20,7 +26,7 @@ export function TopBar() {
       </div>
 
       <p className="hidden shrink-0 text-xs text-text-muted sm:block">
-        共 {total} 部 · 显示 {visible} 部
+        共 {total} 部 · 筛选 {visible} 部 · 地球 {onGlobe}/{MAX_GLOBE_MARKERS}
       </p>
 
       <button

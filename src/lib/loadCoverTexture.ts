@@ -55,8 +55,7 @@ function loadTextureFromUrl(url: string): Promise<THREE.Texture | null> {
           resolve(null)
           return
         }
-        ctx.fillStyle = '#1a1a1a'
-        ctx.fillRect(0, 0, TEX_W, TEX_H)
+        ctx.clearRect(0, 0, TEX_W, TEX_H)
         ctx.drawImage(img, 0, 0, TEX_W, TEX_H)
 
         const texture = new THREE.CanvasTexture(canvas)

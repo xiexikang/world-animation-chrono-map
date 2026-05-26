@@ -25,7 +25,7 @@ import {
 import { FILTER_COUNTRIES } from '@/constants'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
-import { preloadCoverTextures } from '@/lib/loadCoverTexture'
+import { loadCoverTexture } from '@/lib/loadCoverTexture'
 import { useAppStore } from '@/store'
 import type { AnimationNode, CountryCode } from '@/types'
 
@@ -69,13 +69,10 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
   }, [globeNodes])
 
   useEffect(() => {
-    if (globeNodes.length === 0) return
-    void preloadCoverTextures(
-      globeNodes.map((n) => n.cover),
-      12,
-      40,
-    )
-  }, [globeNodes])
+    if (!focusedId) return
+    const node = globeNodes.find((n) => String(n.id) === focusedId)
+    if (node?.cover) void loadCoverTexture(node.cover)
+  }, [focusedId, globeNodes])
 
   useEffect(() => {
     const focus = (id: string) => {

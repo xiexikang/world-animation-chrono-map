@@ -1,13 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  COUNTRY_LABELS,
-  COUNTRY_NODE_COLORS,
-  FILTER_COUNTRIES,
-} from '@/constants'
+import { COUNTRY_LABELS, FILTER_COUNTRIES } from '@/constants'
+import { LazyCoverImage } from '@/components/LazyCoverImage'
 import { PANEL_NODES_PAGE_SIZE } from '@/constants/performance'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
-import { resolveCoverUrl } from '@/lib/coverUrl'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { useAppStore } from '@/store'
 import type { AnimationNode, CountryCode } from '@/types'
@@ -21,14 +17,6 @@ function topTheme(nodes: AnimationNode[]): string {
   }
   const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1])
   return sorted[0]?.[0] ?? '—'
-}
-
-function hexBg(code: CountryCode): string {
-  const hex = COUNTRY_NODE_COLORS[code]
-  const r = (hex >> 16) & 255
-  const g = (hex >> 8) & 255
-  const b = hex & 255
-  return `rgb(${r},${g},${b})`
 }
 
 function selectCountry(code: CountryCode | 'ALL') {
@@ -325,27 +313,18 @@ function NodeAvatar({
   failed: boolean
   onFail: () => void
 }) {
+  const showFallback = failed || !node.cover
+
   return (
     <div
-      className={`aspect-square w-full overflow-hidden rounded-full border-2 transition ${
+      className={`aspect-square w-full overflow-hidden rounded-full border-2 bg-white/5 transition ${
         active ? 'border-accent' : 'border-white/15 group-hover:border-white/30'
       }`}
-      style={
-        failed || !node.cover
-          ? { backgroundColor: hexBg(node.country) }
-          : undefined
-      }
     >
       {node.cover && !failed ? (
-        <img
-          src={resolveCoverUrl(node.cover)}
-          alt=""
-          className="h-full w-full object-cover"
-          crossOrigin="anonymous"
-          loading="lazy"
-          onError={onFail}
-        />
-      ) : (
+        <LazyCoverImage src={node.cover} onError={onFail} />
+      ) : null}
+      {showFallback && (
         <span className="flex h-full w-full items-center justify-center text-xl">
           {country.flag}
         </span>

@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber'
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import type { AnimationNode } from '@/types'
-import { COUNTRY_NODE_COLORS } from '@/constants'
 import { canvasEmitter } from '@/lib/emitter'
 import { loadCoverTexture } from '@/lib/loadCoverTexture'
 import type { LatLng } from './geo'
@@ -21,7 +20,6 @@ interface GlobeNodeMarkerProps {
 }
 
 const _scale = new THREE.Vector3()
-const _color = new THREE.Color()
 
 export function GlobeNodeMarker({
   node,
@@ -40,7 +38,6 @@ export function GlobeNodeMarker({
       const mat = matRef.current
       if (mat) {
         mat.map = null
-        mat.color.setHex(COUNTRY_NODE_COLORS[node.country])
         mat.needsUpdate = true
       }
       return
@@ -53,27 +50,26 @@ export function GlobeNodeMarker({
       const mat = matRef.current
       if (mat) {
         mat.map = tex
-        mat.color.set('#ffffff')
         mat.needsUpdate = true
       }
     })
     return () => {
       alive = false
     }
-  }, [node.cover, node.country, visible])
+  }, [node.cover, visible])
 
   useFrame(() => {
     const g = groupRef.current
     const mat = matRef.current
     if (!g || !mat) return
     const target = focused ? 1.3 : visible ? 1 : 0.75
-    const targetOpacity = visible ? 1 : 0.2
+    const hasCover = Boolean(texture)
+    const targetOpacity =
+      !hasCover ? 0 : visible ? 1 : focused ? 0.85 : 0.18
     _scale.set(target, target, target)
     g.scale.lerp(_scale, 0.15)
-    mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, 0.15)
+    mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, 0.12)
   })
-
-  _color.setHex(COUNTRY_NODE_COLORS[node.country])
 
   return (
     <group ref={groupRef} position={[x, y, z]}>
@@ -96,8 +92,9 @@ export function GlobeNodeMarker({
           <meshBasicMaterial
             ref={matRef}
             map={texture ?? undefined}
-            color={texture ? 0xffffff : _color}
-            transparent={false}
+            color={0xffffff}
+            transparent
+            opacity={0}
             depthTest
             depthWrite={false}
             toneMapped={false}

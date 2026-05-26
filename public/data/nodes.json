@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "1",
+    "title": "大闹天宫",
+    "country": "CN",
+    "era": "60",
+    "themes": [
+      "神话",
+      "反抗",
+      "史诗"
+    ],
+    "cover": "./covers/cn-01.jpg",
+    "description": "《大闹天宫》来自中国，属于1960年代的经典动画，主题涵盖神话、反抗、史诗。",
+    "year": 1960
+  },
+  {
+    "id": "2",
+    "title": "哪吒闹海",
+    "country": "CN",
+    "era": "70",
+    "themes": [
+      "神话",
+      "成长",
+      "悲壮"
+    ],
+    "cover": "./covers/cn-02.jpg",
+    "description": "《哪吒闹海》来自中国，属于1970年代的经典动画，主题涵盖神话、成长、悲壮。",
+    "year": 1970
+  },
+  {
+    "id": "3",
+    "title": "天书奇谭",
+    "country": "CN",
+    "era": "80",
+    "themes": [
+      "奇幻",
+      "民间传说",
+      "幽默"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/zh/b/be/%E5%A4%A9%E4%B9%A6%E5%A5%87%E8%B0%AD.jpg",
+    "description": "《天书奇谭》来自中国，属于1980年代的经典动画，主题涵盖奇幻、民间传说、幽默。",
+    "year": 1980
+  },
+  {
+    "id": "4",
+    "title": "黑猫警长",
+    "country": "CN",
+    "era": "80",
+    "themes": [
+      "正义",
+      "悬疑",
+      "儿童向"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/bd/BlackcatDetective.jpg",
+    "description": "《黑猫警长》来自中国，属于1980年代的经典动画，主题涵盖正义、悬疑、儿童向。",
+    "year": 1980
+  },
+  {
+    "id": "5",
+    "title": "葫芦兄弟",
+    "country": "CN",
+    "era": "80",
+    "themes": [
+      "神话",
+      "冒险",
+      "团队"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/zh/4/49/%E8%91%AB%E8%8A%A6%E5%85%84%E5%BC%9F_%E6%B5%B7%E6%8A%A5.jpg",
+    "description": "《葫芦兄弟》来自中国，属于1980年代的经典动画，主题涵盖神话、冒险、团队。",
+    "year": 1980
+  },
+  {
+    "id": "6",
+    "title": "阿凡提的故事",
+    "country": "CN",
+    "era": "70",
+    "themes": [
+      "寓言",
+      "机智",
+      "民俗"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/zh/b/b1/%E3%80%8A%E9%98%BF%E5%87%A1%E6%8F%90%E3%80%8B%E6%B5%B7%E6%8A%A5.jpg",
+    "description": "《阿凡提的故事》来自中国，属于1970年代的经典动画，主题涵盖寓言、机智、民俗。",
+    "year": 1970
+  },
+  {
+    "id": "7",
+    "title": "舒克和贝塔",
+    "country": "CN",
+    "era": "80",
+    "themes": [
+      "冒险",
+      "友情",
+      "童年"
+    ],
+    "cover": "https://placehold.co/512x720/png?text=Cover",
+    "description": "《舒克和贝塔》来自中国，属于1980年代的经典动画，主题涵盖冒险、友情、童年。",
+    "year": 1980
+  },
+  {
+    "id": "8",
+    "title": "邋遢大王奇遇记",
+    "country": "CN",
+    "era": "80",
+    "themes": [
+      "冒险",
+      "讽刺",
+      "童年"
+    ],
+    "cover": "https://placehold.co/512x720/png?text=Cover",
+    "description": "《邋遢大王奇遇记》来自中国，属于1980年代的经典动画，主题涵盖冒险、讽刺、童年。",
+    "year": 1980
+  },
+  {
+    "id": "9",
+    "title": "宝莲灯",
+    "country": "CN",
+    "era": "90",
+    "themes": [
+      "神话",
+      "亲情",
+      "救赎"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/%E5%AE%9D%E8%8E%B2%E7%81%AF151228.jpg/960px-%E5%AE%9D%E8%8E%B2%E7%81%AF151228.jpg",
+    "description": "《宝莲灯》来自中国，属于1990年代的经典动画，主题涵盖神话、亲情、救赎。",
+    "year": 1990
+  },
+  {
+    "id": "10",
+    "title": "大头儿子和小头爸爸",
+    "country": "CN",
+    "era": "90",
+    "themes": [
+      "家庭",
+      "日常",
+      "治愈"
+    ],
+    "cover": "https://placehold.co/512x720/png?text=Cover",
+    "description": "《大头儿子和小头爸爸》来自中国，属于1990年代的经典动画，主题涵盖家庭、日常、治愈。",
+    "year": 1990
+  },
+  {
+    "id": "11",
+    "title": "喜羊羊与灰太狼",
+    "country": "CN",
+    "era": "00",
+    "themes": [
+      "搞笑",
+      "对抗",
+      "合家欢"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/zh/9/93/Pleasant_Goat_And_Big_Big_Wolf_Official_Logo.png",
+    "description": "《喜羊羊与灰太狼》来自中国，属于2000年代的经典动画，主题涵盖搞笑、对抗、合家欢。",
+    "year": 2000
+  },
+  {
+    "id": "12",
+    "title": "罗小黑战记",
+    "country": "CN",
+    "era": "10",
+    "themes": [
+      "治愈",
+      "奇幻",
+      "成长"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/zh/f/f0/%E7%BD%97%E5%B0%8F%E9%BB%91%E6%88%98%E8%AE%B0_%E6%96%B0%E7%89%88%E6%B5%B7%E6%8A%A5.png",
+    "description": "《罗小黑战记》来自中国，属于2010年代的经典动画，主题涵盖治愈、奇幻、成长。",
+    "year": 2010
+  },
+  {
+    "id": "13",
+    "title": "Astro Boy",
+    "country": "JP",
+    "era": "60",
+    "themes": [
+      "科幻",
+      "人性",
+      "未来"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/a/a6/Astro_Boy-08.jpg",
+    "description": "《Astro Boy》来自日本，属于1960年代的经典动画，主题涵盖科幻、人性、未来。",
+    "year": 1960
+  },
+  {
+    "id": "14",
+    "title": "Doraemon",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "童年",
+      "科幻",
+      "友情"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/c8/Doraemon_volume_1_cover.jpg",
+    "description": "《Doraemon》来自日本，属于1970年代的经典动画，主题涵盖童年、科幻、友情。",
+    "year": 1970
+  },
+  {
+    "id": "15",
+    "title": "Lupin III",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "冒险",
+      "犯罪",
+      "幽默"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Lupin_III_logo.svg/960px-Lupin_III_logo.svg.png",
+    "description": "《Lupin III》来自日本，属于1970年代的经典动画，主题涵盖冒险、犯罪、幽默。",
+    "year": 1970
+  },
+  {
+    "id": "16",
+    "title": "Heidi, Girl of the Alps",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "治愈",
+      "自然",
+      "成长"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/3/3a/Heidi_DVD_1.jpg",
+    "description": "《Heidi, Girl of the Alps》来自日本，属于1970年代的经典动画，主题涵盖治愈、自然、成长。",
+    "year": 1970
+  },
+  {
+    "id": "17",
+    "title": "Mobile Suit Gundam",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "战争",
+      "政治",
+      "机甲"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/d/d5/MOBILESUITGUNDAMPoster.jpg",
+    "description": "《Mobile Suit Gundam》来自日本，属于1970年代的经典动画，主题涵盖战争、政治、机甲。",
+    "year": 1970
+  },
+  {
+    "id": "18",
+    "title": "Space Battleship Yamato",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "科幻",
+      "史诗",
+      "牺牲"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/9/94/Cosmoship_Yamato_vol_1.JPG",
+    "description": "《Space Battleship Yamato》来自日本，属于1970年代的经典动画，主题涵盖科幻、史诗、牺牲。",
+    "year": 1970
+  },
+  {
+    "id": "19",
+    "title": "Galaxy Express 999",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "科幻",
+      "哲学",
+      "旅行"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/f/f2/Galaxy_Express_999_manga_vol_1_%281994_reprint%29.jpg",
+    "description": "《Galaxy Express 999》来自日本，属于1970年代的经典动画，主题涵盖科幻、哲学、旅行。",
+    "year": 1970
+  },
+  {
+    "id": "20",
+    "title": "Future Boy Conan",
+    "country": "JP",
+    "era": "70",
+    "themes": [
+      "冒险",
+      "末世",
+      "希望"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/6/6e/Conan_the_Boy_in_the_Future_%28promotional_artwork%29.jpg",
+    "description": "《Future Boy Conan》来自日本，属于1970年代的经典动画，主题涵盖冒险、末世、希望。",
+    "year": 1970
+  },
+  {
+    "id": "21",
+    "title": "Nausicaä of the Valley of the Wind",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "环保",
+      "反战",
+      "史诗"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/bc/Nausicaaposter.jpg",
+    "description": "《Nausicaä of the Valley of the Wind》来自日本，属于1980年代的经典动画，主题涵盖环保、反战、史诗。",
+    "year": 1980
+  },
+  {
+    "id": "22",
+    "title": "Dragon Ball",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "热血",
+      "冒险",
+      "武道"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Dragon_Ball_manga_1st_Japanese_edition_logo.svg/960px-Dragon_Ball_manga_1st_Japanese_edition_logo.svg.png",
+    "description": "《Dragon Ball》来自日本，属于1980年代的经典动画，主题涵盖热血、冒险、武道。",
+    "year": 1980
+  },
+  {
+    "id": "23",
+    "title": "Saint Seiya",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "热血",
+      "神话",
+      "友情"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/7/75/Saint_Seiya_1.png",
+    "description": "《Saint Seiya》来自日本，属于1980年代的经典动画，主题涵盖热血、神话、友情。",
+    "year": 1980
+  },
+  {
+    "id": "24",
+    "title": "My Neighbor Totoro",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "治愈",
+      "童年",
+      "自然"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/0/02/My_Neighbor_Totoro_-_Tonari_no_Totoro_%28Movie_Poster%29.jpg",
+    "description": "《My Neighbor Totoro》来自日本，属于1980年代的经典动画，主题涵盖治愈、童年、自然。",
+    "year": 1980
+  },
+  {
+    "id": "25",
+    "title": "Grave of the Fireflies",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "战争",
+      "亲情",
+      "悲剧"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/a/a5/Grave_of_the_Fireflies_Japanese_poster.jpg",
+    "description": "《Grave of the Fireflies》来自日本，属于1980年代的经典动画，主题涵盖战争、亲情、悲剧。",
+    "year": 1980
+  },
+  {
+    "id": "26",
+    "title": "Akira (1988 film)",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "赛博朋克",
+      "暴走",
+      "社会批判"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/5/5d/AKIRA_%281988_poster%29.jpg",
+    "description": "《Akira (1988 film)》来自日本，属于1980年代的经典动画，主题涵盖赛博朋克、暴走、社会批判。",
+    "year": 1980
+  },
+  {
+    "id": "27",
+    "title": "Ranma 1/2",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "喜剧",
+      "变身",
+      "恋爱"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/1/10/Ranma1_2volume1.jpg",
+    "description": "《Ranma 1/2》来自日本，属于1980年代的经典动画，主题涵盖喜剧、变身、恋爱。",
+    "year": 1980
+  },
+  {
+    "id": "28",
+    "title": "Kiki's Delivery Service",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "成长",
+      "治愈",
+      "独立"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/0/07/Kiki%27s_Delivery_Service_%28Movie%29.jpg",
+    "description": "《Kiki's Delivery Service》来自日本，属于1980年代的经典动画，主题涵盖成长、治愈、独立。",
+    "year": 1980
+  },
+  {
+    "id": "29",
+    "title": "City Hunter",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "动作",
+      "喜剧",
+      "都市"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/d/dd/City_Hunter_1.png",
+    "description": "《City Hunter》来自日本，属于1980年代的经典动画，主题涵盖动作、喜剧、都市。",
+    "year": 1980
+  },
+  {
+    "id": "30",
+    "title": "Fist of the North Star",
+    "country": "JP",
+    "era": "80",
+    "themes": [
+      "末世",
+      "热血",
+      "复仇"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/ce/Fist_of_the_North_Star_1.png",
+    "description": "《Fist of the North Star》来自日本，属于1980年代的经典动画，主题涵盖末世、热血、复仇。",
+    "year": 1980
+  },
+  {
+    "id": "31",
+    "title": "Slam Dunk",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "青春",
+      "体育",
+      "友情"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Griner_dunking_at_2015_All-Star_game_%28cropped%29.jpg",
+    "description": "《Slam Dunk》来自日本，属于1990年代的经典动画，主题涵盖青春、体育、友情。",
+    "year": 1990
+  },
+  {
+    "id": "32",
+    "title": "Detective Conan",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "推理",
+      "悬疑",
+      "连载"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/3/3f/Case_Closed_Volume_36.png",
+    "description": "《Detective Conan》来自日本，属于1990年代的经典动画，主题涵盖推理、悬疑、连载。",
+    "year": 1990
+  },
+  {
+    "id": "33",
+    "title": "One Piece",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "冒险",
+      "自由",
+      "伙伴"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/9/90/One_Piece%2C_Volume_61_Cover_%28Japanese%29.jpg",
+    "description": "《One Piece》来自日本，属于1990年代的经典动画，主题涵盖冒险、自由、伙伴。",
+    "year": 1990
+  },
+  {
+    "id": "34",
+    "title": "Cowboy Bebop",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "科幻",
+      "公路",
+      "宿命"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/a/a9/Cowboy_Bebop_key_visual.jpg",
+    "description": "《Cowboy Bebop》来自日本，属于1990年代的经典动画，主题涵盖科幻、公路、宿命。",
+    "year": 1990
+  },
+  {
+    "id": "35",
+    "title": "Neon Genesis Evangelion",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "科幻",
+      "哲学",
+      "心理"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/7/72/Evangelion_retouched.png",
+    "description": "《Neon Genesis Evangelion》来自日本，属于1990年代的经典动画，主题涵盖科幻、哲学、心理。",
+    "year": 1990
+  },
+  {
+    "id": "36",
+    "title": "Ghost in the Shell (1995 film)",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "赛博朋克",
+      "身份",
+      "哲学"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/ca/Ghostintheshellposter.jpg",
+    "description": "《Ghost in the Shell (1995 film)》来自日本，属于1990年代的经典动画，主题涵盖赛博朋克、身份、哲学。",
+    "year": 1990
+  },
+  {
+    "id": "37",
+    "title": "Princess Mononoke",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "自然",
+      "冲突",
+      "史诗"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/8/8c/Princess_Mononoke_Japanese_poster.png",
+    "description": "《Princess Mononoke》来自日本，属于1990年代的经典动画，主题涵盖自然、冲突、史诗。",
+    "year": 1990
+  },
+  {
+    "id": "38",
+    "title": "Pokémon",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "冒险",
+      "伙伴",
+      "成长"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/960px-International_Pok%C3%A9mon_logo.svg.png",
+    "description": "《Pokémon》来自日本，属于1990年代的经典动画，主题涵盖冒险、伙伴、成长。",
+    "year": 1990
+  },
+  {
+    "id": "39",
+    "title": "Cardcaptor Sakura",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "魔法",
+      "恋爱",
+      "治愈"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/5/50/Cardcaptor_Sakura_vol1_cover.jpg",
+    "description": "《Cardcaptor Sakura》来自日本，属于1990年代的经典动画，主题涵盖魔法、恋爱、治愈。",
+    "year": 1990
+  },
+  {
+    "id": "40",
+    "title": "Rurouni Kenshin",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "历史",
+      "救赎",
+      "动作"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/cc/Rurouni_Kenshin_28.png",
+    "description": "《Rurouni Kenshin》来自日本，属于1990年代的经典动画，主题涵盖历史、救赎、动作。",
+    "year": 1990
+  },
+  {
+    "id": "41",
+    "title": "Yu Yu Hakusho",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "热血",
+      "灵异",
+      "友情"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/b7/YuYu_Hakusho_1.png",
+    "description": "《Yu Yu Hakusho》来自日本，属于1990年代的经典动画，主题涵盖热血、灵异、友情。",
+    "year": 1990
+  },
+  {
+    "id": "42",
+    "title": "Digimon Adventure",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "冒险",
+      "成长",
+      "伙伴"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/zh/5/59/Digimon_Adventure_Logo.png",
+    "description": "《Digimon Adventure》来自日本，属于1990年代的经典动画，主题涵盖冒险、成长、伙伴。",
+    "year": 1990
+  },
+  {
+    "id": "43",
+    "title": "Crayon Shin-chan",
+    "country": "JP",
+    "era": "90",
+    "themes": [
+      "家庭",
+      "日常",
+      "无厘头"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/9/92/Crayon_Shin-chan_vol_1_cover.jpg",
+    "description": "《Crayon Shin-chan》来自日本，属于1990年代的经典动画，主题涵盖家庭、日常、无厘头。",
+    "year": 1990
+  },
+  {
+    "id": "44",
+    "title": "Spirited Away",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "奇幻",
+      "成长",
+      "寓言"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/d/db/Spirited_Away_Japanese_poster.png",
+    "description": "《Spirited Away》来自日本，属于2000年代的经典动画，主题涵盖奇幻、成长、寓言。",
+    "year": 2000
+  },
+  {
+    "id": "45",
+    "title": "Naruto",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "热血",
+      "成长",
+      "羁绊"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg",
+    "description": "《Naruto》来自日本，属于2000年代的经典动画，主题涵盖热血、成长、羁绊。",
+    "year": 2000
+  },
+  {
+    "id": "46",
+    "title": "Fullmetal Alchemist",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "冒险",
+      "代价",
+      "亲情"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/9/9d/Fullmetal123.jpg",
+    "description": "《Fullmetal Alchemist》来自日本，属于2000年代的经典动画，主题涵盖冒险、代价、亲情。",
+    "year": 2000
+  },
+  {
+    "id": "47",
+    "title": "Death Note",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "智斗",
+      "道德",
+      "悬疑"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/6/6f/Death_Note_Vol_1.jpg",
+    "description": "《Death Note》来自日本，属于2000年代的经典动画，主题涵盖智斗、道德、悬疑。",
+    "year": 2000
+  },
+  {
+    "id": "48",
+    "title": "Gintama",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "搞笑",
+      "热血",
+      "反套路"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/a/a9/Gintama_vol._01.png",
+    "description": "《Gintama》来自日本，属于2000年代的经典动画，主题涵盖搞笑、热血、反套路。",
+    "year": 2000
+  },
+  {
+    "id": "49",
+    "title": "Code Geass",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "政治",
+      "权力",
+      "反叛"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/7/74/Code_Geass_R1_box_set_cover.jpg",
+    "description": "《Code Geass》来自日本，属于2000年代的经典动画，主题涵盖政治、权力、反叛。",
+    "year": 2000
+  },
+  {
+    "id": "50",
+    "title": "Natsume's Book of Friends",
+    "country": "JP",
+    "era": "00",
+    "themes": [
+      "治愈",
+      "妖怪",
+      "孤独"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/8/88/Natsume%27s_Book_of_Friends_1.png",
+    "description": "《Natsume's Book of Friends》来自日本，属于2000年代的经典动画，主题涵盖治愈、妖怪、孤独。",
+    "year": 2000
+  },
+  {
+    "id": "51",
+    "title": "Your Name",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "爱情",
+      "时间",
+      "命运"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/0/0b/Your_Name_poster.png",
+    "description": "《Your Name》来自日本，属于2010年代的经典动画，主题涵盖爱情、时间、命运。",
+    "year": 2010
+  },
+  {
+    "id": "52",
+    "title": "Attack on Titan",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "战争",
+      "生存",
+      "阴谋"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg",
+    "description": "《Attack on Titan》来自日本，属于2010年代的经典动画，主题涵盖战争、生存、阴谋。",
+    "year": 2010
+  },
+  {
+    "id": "53",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "热血",
+      "亲情",
+      "复仇"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/0/09/Demon_Slayer_-_Kimetsu_no_Yaiba%2C_volume_1.jpg",
+    "description": "《Demon Slayer: Kimetsu no Yaiba》来自日本，属于2010年代的经典动画，主题涵盖热血、亲情、复仇。",
+    "year": 2010
+  },
+  {
+    "id": "54",
+    "title": "My Hero Academia",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "成长",
+      "英雄",
+      "热血"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/5/5a/Boku_no_Hero_Academia_Volume_1.png",
+    "description": "《My Hero Academia》来自日本，属于2010年代的经典动画，主题涵盖成长、英雄、热血。",
+    "year": 2010
+  },
+  {
+    "id": "55",
+    "title": "Steins;Gate",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "科幻",
+      "时间",
+      "悬疑"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/e/e4/Steins%3BGate_cover_art.jpg",
+    "description": "《Steins;Gate》来自日本，属于2010年代的经典动画，主题涵盖科幻、时间、悬疑。",
+    "year": 2010
+  },
+  {
+    "id": "56",
+    "title": "Puella Magi Madoka Magica",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "反童话",
+      "宿命",
+      "心理"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/f/fc/MadokaBD.jpg",
+    "description": "《Puella Magi Madoka Magica》来自日本，属于2010年代的经典动画，主题涵盖反童话、宿命、心理。",
+    "year": 2010
+  },
+  {
+    "id": "57",
+    "title": "Violet Evergarden",
+    "country": "JP",
+    "era": "10",
+    "themes": [
+      "治愈",
+      "战争余波",
+      "成长"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/be/Violet_Evergarden_light_novel_volume_1_cover.jpg",
+    "description": "《Violet Evergarden》来自日本，属于2010年代的经典动画，主题涵盖治愈、战争余波、成长。",
+    "year": 2010
+  },
+  {
+    "id": "58",
+    "title": "Snow White and the Seven Dwarfs (1937 film)",
+    "country": "US",
+    "era": "30",
+    "themes": [
+      "童话",
+      "经典",
+      "合家欢"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Snow_White_and_the_Seven_Dwarfs_%28Style_B%29_poster.jpg/960px-Snow_White_and_the_Seven_Dwarfs_%28Style_B%29_poster.jpg",
+    "description": "《Snow White and the Seven Dwarfs (1937 film)》来自美国，属于1930年代的经典动画，主题涵盖童话、经典、合家欢。",
+    "year": 2000
+  },
+  {
+    "id": "59",
+    "title": "Pinocchio (1940 film)",
+    "country": "US",
+    "era": "40",
+    "themes": [
+      "成长",
+      "道德",
+      "童话"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/ba/Pinocchio-1940-poster.jpg",
+    "description": "《Pinocchio (1940 film)》来自美国，属于1940年代的经典动画，主题涵盖成长、道德、童话。",
+    "year": 2000
+  },
+  {
+    "id": "60",
+    "title": "Fantasia (1940 film)",
+    "country": "US",
+    "era": "40",
+    "themes": [
+      "音乐",
+      "实验",
+      "艺术"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/6/6b/Fantasia1940.jpg",
+    "description": "《Fantasia (1940 film)》来自美国，属于1940年代的经典动画，主题涵盖音乐、实验、艺术。",
+    "year": 2000
+  },
+  {
+    "id": "61",
+    "title": "Bambi",
+    "country": "US",
+    "era": "40",
+    "themes": [
+      "自然",
+      "成长",
+      "生命"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/8/88/Walt_Disney%27s_Bambi_poster.jpg",
+    "description": "《Bambi》来自美国，属于1940年代的经典动画，主题涵盖自然、成长、生命。",
+    "year": 2000
+  },
+  {
+    "id": "62",
+    "title": "Cinderella (1950 film)",
+    "country": "US",
+    "era": "50",
+    "themes": [
+      "童话",
+      "逆袭",
+      "浪漫"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/1950_is_the_Cinderella_year.jpg/960px-1950_is_the_Cinderella_year.jpg",
+    "description": "《Cinderella (1950 film)》来自美国，属于1950年代的经典动画，主题涵盖童话、逆袭、浪漫。",
+    "year": 2000
+  },
+  {
+    "id": "63",
+    "title": "Peter Pan (1953 film)",
+    "country": "US",
+    "era": "50",
+    "themes": [
+      "冒险",
+      "童年",
+      "幻想"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Peter_Pan_%281953_poster%29.jpg/960px-Peter_Pan_%281953_poster%29.jpg",
+    "description": "《Peter Pan (1953 film)》来自美国，属于1950年代的经典动画，主题涵盖冒险、童年、幻想。",
+    "year": 2000
+  },
+  {
+    "id": "64",
+    "title": "Sleeping Beauty (1959 film)",
+    "country": "US",
+    "era": "50",
+    "themes": [
+      "童话",
+      "浪漫",
+      "经典"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Sleeping_Beauty_%281959_poster_-_Style_A%29.jpg/960px-Sleeping_Beauty_%281959_poster_-_Style_A%29.jpg",
+    "description": "《Sleeping Beauty (1959 film)》来自美国，属于1950年代的经典动画，主题涵盖童话、浪漫、经典。",
+    "year": 2000
+  },
+  {
+    "id": "65",
+    "title": "One Hundred and One Dalmatians",
+    "country": "US",
+    "era": "60",
+    "themes": [
+      "冒险",
+      "家庭",
+      "喜剧"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/cd/One_Hundred_and_One_Dalmatians_movie_poster.jpg",
+    "description": "《One Hundred and One Dalmatians》来自美国，属于1960年代的经典动画，主题涵盖冒险、家庭、喜剧。",
+    "year": 1960
+  },
+  {
+    "id": "66",
+    "title": "The Little Mermaid (1989 film)",
+    "country": "US",
+    "era": "80",
+    "themes": [
+      "童话",
+      "梦想",
+      "爱情"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/c0/The_Little_Mermaid_%28Official_1989_Film_Poster%29.png",
+    "description": "《The Little Mermaid (1989 film)》来自美国，属于1980年代的经典动画，主题涵盖童话、梦想、爱情。",
+    "year": 1980
+  },
+  {
+    "id": "67",
+    "title": "Beauty and the Beast (1991 film)",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "爱情",
+      "偏见",
+      "童话"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/5/5e/Beauty_and_the_Beast_%281991_film%29_poster.jpg",
+    "description": "《Beauty and the Beast (1991 film)》来自美国，属于1990年代的经典动画，主题涵盖爱情、偏见、童话。",
+    "year": 1990
+  },
+  {
+    "id": "68",
+    "title": "Aladdin (1992 Disney film)",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "冒险",
+      "浪漫",
+      "奇幻"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/bd/Aladdin_%281992_Disney_film%29_poster.jpg",
+    "description": "《Aladdin (1992 Disney film)》来自美国，属于1990年代的经典动画，主题涵盖冒险、浪漫、奇幻。",
+    "year": 1990
+  },
+  {
+    "id": "69",
+    "title": "The Lion King",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "成长",
+      "责任",
+      "史诗"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/3/3d/The_Lion_King_poster.jpg",
+    "description": "《The Lion King》来自美国，属于1990年代的经典动画，主题涵盖成长、责任、史诗。",
+    "year": 1990
+  },
+  {
+    "id": "70",
+    "title": "Toy Story",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "友情",
+      "成长",
+      "玩具"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/1/13/Toy_Story.jpg",
+    "description": "《Toy Story》来自美国，属于1990年代的经典动画，主题涵盖友情、成长、玩具。",
+    "year": 1990
+  },
+  {
+    "id": "71",
+    "title": "SpongeBob SquarePants",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "无厘头",
+      "日常",
+      "喜剧"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/SpongeBob_SquarePants_Logo_%282008%29.svg/960px-SpongeBob_SquarePants_Logo_%282008%29.svg.png",
+    "description": "《SpongeBob SquarePants》来自美国，属于1990年代的经典动画，主题涵盖无厘头、日常、喜剧。",
+    "year": 1990
+  },
+  {
+    "id": "72",
+    "title": "The Simpsons",
+    "country": "US",
+    "era": "80",
+    "themes": [
+      "讽刺",
+      "家庭",
+      "社会观察"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/The_Simpsons_yellow_logo.svg/960px-The_Simpsons_yellow_logo.svg.png",
+    "description": "《The Simpsons》来自美国，属于1980年代的经典动画，主题涵盖讽刺、家庭、社会观察。",
+    "year": 1980
+  },
+  {
+    "id": "73",
+    "title": "South Park",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "讽刺",
+      "社会议题",
+      "黑色幽默"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/5/59/South_Park.png",
+    "description": "《South Park》来自美国，属于1990年代的经典动画，主题涵盖讽刺、社会议题、黑色幽默。",
+    "year": 1990
+  },
+  {
+    "id": "74",
+    "title": "Futurama",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "科幻",
+      "讽刺",
+      "喜剧"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Futurama_1999_logo.svg/960px-Futurama_1999_logo.svg.png",
+    "description": "《Futurama》来自美国，属于1990年代的经典动画，主题涵盖科幻、讽刺、喜剧。",
+    "year": 1990
+  },
+  {
+    "id": "75",
+    "title": "Avatar: The Last Airbender",
+    "country": "US",
+    "era": "00",
+    "themes": [
+      "奇幻",
+      "成长",
+      "冒险"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Avatar_The_Last_Airbender_logo.svg/960px-Avatar_The_Last_Airbender_logo.svg.png",
+    "description": "《Avatar: The Last Airbender》来自美国，属于2000年代的经典动画，主题涵盖奇幻、成长、冒险。",
+    "year": 2000
+  },
+  {
+    "id": "76",
+    "title": "Samurai Jack",
+    "country": "US",
+    "era": "00",
+    "themes": [
+      "动作",
+      "美术风格",
+      "孤独"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Samurai_Jack_logo.png",
+    "description": "《Samurai Jack》来自美国，属于2000年代的经典动画，主题涵盖动作、美术风格、孤独。",
+    "year": 2000
+  },
+  {
+    "id": "77",
+    "title": "Family Guy",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "讽刺",
+      "无厘头",
+      "家庭"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Family_Guy_Logo.svg/960px-Family_Guy_Logo.svg.png",
+    "description": "《Family Guy》来自美国，属于1990年代的经典动画，主题涵盖讽刺、无厘头、家庭。",
+    "year": 1990
+  },
+  {
+    "id": "78",
+    "title": "Finding Nemo",
+    "country": "US",
+    "era": "00",
+    "themes": [
+      "亲情",
+      "冒险",
+      "海洋"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/2/29/Finding_Nemo.jpg",
+    "description": "《Finding Nemo》来自美国，属于2000年代的经典动画，主题涵盖亲情、冒险、海洋。",
+    "year": 2000
+  },
+  {
+    "id": "79",
+    "title": "Shrek",
+    "country": "US",
+    "era": "00",
+    "themes": [
+      "反童话",
+      "喜剧",
+      "自我接纳"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/7/7b/Shrek_%282001_animated_feature_film%29.jpg",
+    "description": "《Shrek》来自美国，属于2000年代的经典动画，主题涵盖反童话、喜剧、自我接纳。",
+    "year": 2000
+  },
+  {
+    "id": "80",
+    "title": "WALL-E",
+    "country": "US",
+    "era": "00",
+    "themes": [
+      "科幻",
+      "环保",
+      "孤独"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/4/4c/WALL-E_poster.jpg",
+    "description": "《WALL-E》来自美国，属于2000年代的经典动画，主题涵盖科幻、环保、孤独。",
+    "year": 2000
+  },
+  {
+    "id": "81",
+    "title": "Adventure Time",
+    "country": "US",
+    "era": "10",
+    "themes": [
+      "奇幻",
+      "成长",
+      "荒诞"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/3/37/Adventure_Time_-_Title_card.png",
+    "description": "《Adventure Time》来自美国，属于2010年代的经典动画，主题涵盖奇幻、成长、荒诞。",
+    "year": 2010
+  },
+  {
+    "id": "82",
+    "title": "Gravity Falls",
+    "country": "US",
+    "era": "10",
+    "themes": [
+      "悬疑",
+      "奇幻",
+      "成长"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/c/c2/Gravity_Falls_logo.png",
+    "description": "《Gravity Falls》来自美国，属于2010年代的经典动画，主题涵盖悬疑、奇幻、成长。",
+    "year": 2010
+  },
+  {
+    "id": "83",
+    "title": "Rick and Morty",
+    "country": "US",
+    "era": "10",
+    "themes": [
+      "科幻",
+      "黑色幽默",
+      "哲学"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Rick_and_Morty.svg/960px-Rick_and_Morty.svg.png",
+    "description": "《Rick and Morty》来自美国，属于2010年代的经典动画，主题涵盖科幻、黑色幽默、哲学。",
+    "year": 2010
+  },
+  {
+    "id": "84",
+    "title": "BoJack Horseman",
+    "country": "US",
+    "era": "10",
+    "themes": [
+      "抑郁",
+      "自我反思",
+      "讽刺"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/BoJack_Horseman_Logo.svg/960px-BoJack_Horseman_Logo.svg.png",
+    "description": "《BoJack Horseman》来自美国，属于2010年代的经典动画，主题涵盖抑郁、自我反思、讽刺。",
+    "year": 2010
+  },
+  {
+    "id": "85",
+    "title": "Steven Universe",
+    "country": "US",
+    "era": "10",
+    "themes": [
+      "治愈",
+      "家庭",
+      "自我认同"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/4/44/Steven_Universe_-_Title_Card.png",
+    "description": "《Steven Universe》来自美国，属于2010年代的经典动画，主题涵盖治愈、家庭、自我认同。",
+    "year": 2010
+  },
+  {
+    "id": "86",
+    "title": "Arcane (TV series)",
+    "country": "US",
+    "era": "20",
+    "themes": [
+      "悲剧",
+      "阶级",
+      "动作"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Arcane_Title_Text.png",
+    "description": "《Arcane (TV series)》来自美国，属于2020年代的经典动画，主题涵盖悲剧、阶级、动作。",
+    "year": 2020
+  },
+  {
+    "id": "87",
+    "title": "The Powerpuff Girls",
+    "country": "US",
+    "era": "90",
+    "themes": [
+      "动作",
+      "喜剧",
+      "女孩力量"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/The_Powerpuff_Girls_logo.svg/960px-The_Powerpuff_Girls_logo.svg.png",
+    "description": "《The Powerpuff Girls》来自美国，属于1990年代的经典动画，主题涵盖动作、喜剧、女孩力量。",
+    "year": 1990
+  },
+  {
+    "id": "88",
+    "title": "Astérix",
+    "country": "EU",
+    "era": "60",
+    "themes": [
+      "冒险",
+      "幽默",
+      "历史"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Asterix.svg/960px-Asterix.svg.png",
+    "description": "《Astérix》来自法国，属于1960年代的经典动画，主题涵盖冒险、幽默、历史。",
+    "year": 1960
+  },
+  {
+    "id": "89",
+    "title": "The Adventures of Tintin (TV series)",
+    "country": "EU",
+    "era": "90",
+    "themes": [
+      "冒险",
+      "侦探",
+      "旅行"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/f/f9/The_Adventures_of_Tintin_%28TV%29.jpg",
+    "description": "《The Adventures of Tintin (TV series)》来自比利时，属于1990年代的经典动画，主题涵盖冒险、侦探、旅行。",
+    "year": 1990
+  },
+  {
+    "id": "90",
+    "title": "The Smurfs",
+    "country": "EU",
+    "era": "80",
+    "themes": [
+      "合家欢",
+      "奇幻",
+      "童年"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/d/dc/The_Smurfs_logo_%282019%29.png",
+    "description": "《The Smurfs》来自比利时，属于1980年代的经典动画，主题涵盖合家欢、奇幻、童年。",
+    "year": 1980
+  },
+  {
+    "id": "91",
+    "title": "Moomin (1990 TV series)",
+    "country": "EU",
+    "era": "90",
+    "themes": [
+      "治愈",
+      "童话",
+      "家庭"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/f/fe/1990_Moomin_Anime_Title.png",
+    "description": "《Moomin (1990 TV series)》来自芬兰，属于1990年代的经典动画，主题涵盖治愈、童话、家庭。",
+    "year": 1990
+  },
+  {
+    "id": "92",
+    "title": "Shaun the Sheep",
+    "country": "UK",
+    "era": "00",
+    "themes": [
+      "无对白",
+      "喜剧",
+      "日常"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/4/4a/Shaun_the_Sheep.png",
+    "description": "《Shaun the Sheep》来自英国，属于2000年代的经典动画，主题涵盖无对白、喜剧、日常。",
+    "year": 2000
+  },
+  {
+    "id": "93",
+    "title": "Wallace and Gromit",
+    "country": "UK",
+    "era": "90",
+    "themes": [
+      "定格动画",
+      "喜剧",
+      "发明"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Wallace_and_Gromit_logo.svg/960px-Wallace_and_Gromit_logo.svg.png",
+    "description": "《Wallace and Gromit》来自英国，属于1990年代的经典动画，主题涵盖定格动画、喜剧、发明。",
+    "year": 1990
+  },
+  {
+    "id": "94",
+    "title": "The Secret of Kells",
+    "country": "UK",
+    "era": "00",
+    "themes": [
+      "艺术风格",
+      "神话",
+      "成长"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/a/ac/The_Secret_Of_Kells_Promo_Poster.jpg",
+    "description": "《The Secret of Kells》来自爱尔兰，属于2000年代的经典动画，主题涵盖艺术风格、神话、成长。",
+    "year": 2000
+  },
+  {
+    "id": "95",
+    "title": "Song of the Sea (2014 film)",
+    "country": "UK",
+    "era": "10",
+    "themes": [
+      "神话",
+      "亲情",
+      "治愈"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/4/4f/Song_of_the_Sea_%282014_film%29_poster.jpg",
+    "description": "《Song of the Sea (2014 film)》来自爱尔兰，属于2010年代的经典动画，主题涵盖神话、亲情、治愈。",
+    "year": 2010
+  },
+  {
+    "id": "96",
+    "title": "The Triplets of Belleville",
+    "country": "EU",
+    "era": "00",
+    "themes": [
+      "黑色幽默",
+      "音乐",
+      "怪诞"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/9/9e/Triplets_of_Belleville-Poster.jpg",
+    "description": "《The Triplets of Belleville》来自法国，属于2000年代的经典动画，主题涵盖黑色幽默、音乐、怪诞。",
+    "year": 2000
+  },
+  {
+    "id": "97",
+    "title": "Cheburashka",
+    "country": "EU",
+    "era": "70",
+    "themes": [
+      "童年",
+      "友情",
+      "温暖"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/7/76/RR5111-0439R_3_%D1%80%D1%83%D0%B1%D0%BB%D1%8F_%D1%81%D0%B5%D1%80%D0%B5%D0%B1%D1%80%D0%BE_2020_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B9%D1%81%D0%BA%D0%B0%D1%8F_%D0%BC%D1%83%D0%BB%D1%8C%D1%82%D0%B8%D0%BF%D0%BB%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%9A%D1%80%D0%BE%D0%BA%D0%BE%D0%B4%D0%B8%D0%BB_%D0%93%D0%B5%D0%BD%D0%B0_%D1%80%D0%B5%D0%B2%D0%B5%D1%80%D1%81.png",
+    "description": "《Cheburashka》来自俄罗斯，属于1970年代的经典动画，主题涵盖童年、友情、温暖。",
+    "year": 1970
+  },
+  {
+    "id": "98",
+    "title": "Hedgehog in the Fog",
+    "country": "EU",
+    "era": "70",
+    "themes": [
+      "诗意",
+      "哲学",
+      "孤独"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/The_Soviet_Union_1988_CPA_5919_stamp_%28Hedgehog_in_the_Fog%29.jpg/960px-The_Soviet_Union_1988_CPA_5919_stamp_%28Hedgehog_in_the_Fog%29.jpg",
+    "description": "《Hedgehog in the Fog》来自俄罗斯，属于1970年代的经典动画，主题涵盖诗意、哲学、孤独。",
+    "year": 1970
+  },
+  {
+    "id": "99",
+    "title": "The Snow Queen (1957 film)",
+    "country": "EU",
+    "era": "50",
+    "themes": [
+      "童话",
+      "冒险",
+      "坚韧"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/1960_-_Earle_Theater_Ad_-_24_Aug_MC_-_Allentown_PA.jpg/960px-1960_-_Earle_Theater_Ad_-_24_Aug_MC_-_Allentown_PA.jpg",
+    "description": "《The Snow Queen (1957 film)》来自俄罗斯，属于1950年代的经典动画，主题涵盖童话、冒险、坚韧。",
+    "year": 2000
+  },
+  {
+    "id": "100",
+    "title": "Kirikou and the Sorceress",
+    "country": "EU",
+    "era": "90",
+    "themes": [
+      "民间传说",
+      "成长",
+      "勇气"
+    ],
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/bc/Kirikou_et_la_sorci%C3%A8re.jpg",
+    "description": "《Kirikou and the Sorceress》来自法国，属于1990年代的经典动画，主题涵盖民间传说、成长、勇气。",
+    "year": 1990
+  }
+]

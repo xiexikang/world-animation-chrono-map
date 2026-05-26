@@ -1,0 +1,52 @@
+{
+  "name": "world-animation-chrono-map",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "covers:download": "node scripts/download-covers.mjs",
+    "covers:cn10": "node scripts/download-covers.mjs \"%USERPROFILE%\\Downloads\\animations_100_with_covers.json\" --cn10",
+    "covers:sync": "node scripts/sync-local-covers.mjs",
+    "data:normalize": "node scripts/normalize-nodes.mjs"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.17.14",
+    "@turf/bbox": "^7.3.5",
+    "@turf/boolean-point-in-polygon": "^7.3.5",
+    "@turf/helpers": "^7.3.5",
+    "gsap": "^3.15.0",
+    "mitt": "^3.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.184.0",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.15.29",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "@types/three": "^0.184.1",
+    "@types/topojson-client": "^3.1.5",
+    "@types/topojson-specification": "^1.0.5",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.59.2",
+    "vite": "^8.0.14"
+  },
+  "packageManager": "pnpm@8.15.1"
+}

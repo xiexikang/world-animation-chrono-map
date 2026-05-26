@@ -63,7 +63,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   era: 'all',
   themes: [],
-  countries: [],
+  countries: ['CN'],
   searchQuery: '',
 
   zoom: 1,
@@ -114,7 +114,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   setCanvasTransform: (zoom, panX, panY) => set({ zoom, panX, panY }),
 
   resetFilters: () =>
-    set({ era: 'all', themes: [], countries: [], searchQuery: '' }),
+    set({ era: 'all', themes: [], countries: ['CN'], searchQuery: '' }),
 
   getVisibleSet: () => {
     const { allNodes, era, themes, countries, searchQuery } = get()

@@ -15,6 +15,8 @@ export interface AnimationNode {
   description?: string
   quote?: string
   externalUrl?: string
+  /** TMDB popularity，用于地球展示优先级 */
+  popularity?: number
 }
 
 export interface RegionBounds {

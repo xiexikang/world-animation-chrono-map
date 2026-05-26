@@ -35,6 +35,16 @@ export function GlobeNodeMarker({
   const [texture, setTexture] = useState<THREE.Texture | null>(null)
 
   useEffect(() => {
+    if (!visible) {
+      setTexture(null)
+      const mat = matRef.current
+      if (mat) {
+        mat.map = null
+        mat.color.setHex(COUNTRY_NODE_COLORS[node.country])
+        mat.needsUpdate = true
+      }
+      return
+    }
     let alive = true
     setTexture(null)
     void loadCoverTexture(node.cover).then((tex) => {
@@ -50,7 +60,7 @@ export function GlobeNodeMarker({
     return () => {
       alive = false
     }
-  }, [node.cover])
+  }, [node.cover, node.country, visible])
 
   useFrame(() => {
     const g = groupRef.current

@@ -28,15 +28,16 @@ pnpm dev
 - **点击节点**：聚焦该国区域 + 详情卡
 - **复位视图**：恢复默认相机
 
-## 数据（当前调试：中国 10 条）
+## 数据
 
-- `public/data/nodes.json` — **10 条 CN** 动画元数据
-- `public/covers/cn-01.svg` … `cn-10.svg` — 本地封面（可替换为 `.webp` / `.jpg`，并改 JSON 里 `cover` 路径）
+- `src/data/animationData.json` — TMDB 原始结构（与 `raw_anime_CN.json` 同 schema），**前端启动时加载并转换**
+- `src/data/raw_anime_CN.json` — 中国动画源数据；同步到 animationData：`pnpm data:sync-animation`
+- `public/data/nodes.json` — 可选导出（`pnpm data:tmdb-to-nodes`），运行时不再使用
 
-重新生成 CN 10 条占位数据：
+从 TMDB 源同步 animationData：
 
 ```bash
-node scripts/setup-cn10-local.mjs
+pnpm data:sync-animation
 ```
 
 节点 `country` 字段决定地球上的大致经纬度位置（同国多作品自动分散）。

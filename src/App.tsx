@@ -10,6 +10,10 @@ import { TopBar } from '@/components/TopBar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { loadAnimationNodes } from '@/lib/loadAnimationData'
 import { loadCountryCategories } from '@/lib/loadCountryCategories'
+import {
+  buildThemeDictionaryFromItems,
+  loadThemeItems,
+} from '@/lib/loadThemeDictionary'
 import { useAppStore } from '@/store'
 
 function App() {
@@ -17,6 +21,7 @@ function App() {
   const nodesLoaded = useAppStore((s) => s.nodesLoaded)
   const setNodes = useAppStore((s) => s.setNodes)
   const setCountryCategories = useAppStore((s) => s.setCountryCategories)
+  const setThemeItems = useAppStore((s) => s.setThemeItems)
   const setSidebarOpen = useAppStore((s) => s.setSidebarOpen)
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const isTablet = useMediaQuery('(min-width: 768px)')
@@ -27,21 +32,43 @@ function App() {
   const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    setLoadError(null)
-    setLoadProgress(null)
-    void loadCountryCategories()
-      .then(setCountryCategories)
-      .catch((err) => console.error('加载国家分类失败:', err))
+    let cancelled = false
 
-    loadAnimationNodes((loaded, total) => setLoadProgress({ loaded, total }))
-      .then(setNodes)
-      .catch((err) => {
+    async function bootstrap() {
+      setLoadError(null)
+      setLoadProgress(null)
+      try {
+        const [countries, themeItems] = await Promise.all([
+          loadCountryCategories(),
+          loadThemeItems(),
+        ])
+        if (cancelled) return
+
+        setCountryCategories(countries)
+        setThemeItems(themeItems)
+
+        const themeDictionary = buildThemeDictionaryFromItems(themeItems)
+        const nodes = await loadAnimationNodes(
+          (loaded, total) => setLoadProgress({ loaded, total }),
+          themeDictionary,
+        )
+        if (cancelled) return
+
+        setNodes(nodes)
+      } catch (err) {
+        if (cancelled) return
         const message =
-          err instanceof Error ? err.message : '加载动画数据失败'
+          err instanceof Error ? err.message : '加载数据失败'
         setLoadError(message)
-        console.error('加载动画数据失败:', err)
-      })
-  }, [setNodes, setCountryCategories])
+        console.error('加载数据失败:', err)
+      }
+    }
+
+    void bootstrap()
+    return () => {
+      cancelled = true
+    }
+  }, [setNodes, setCountryCategories, setThemeItems])
 
   useEffect(() => {
     if (isDesktop) {

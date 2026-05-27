@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { themeColor } from '@/constants'
 import { useAppStore } from '@/store'
 
@@ -6,16 +5,9 @@ export function ThemeDrawer() {
   const open = useAppStore((s) => s.mobileThemeOpen)
   const setMobileThemeOpen = useAppStore((s) => s.setMobileThemeOpen)
   const themes = useAppStore((s) => s.themes)
-  const allNodes = useAppStore((s) => s.allNodes)
+  const themeTagOptions = useAppStore((s) => s.themeTagOptions)
+  const themesLoaded = useAppStore((s) => s.themesLoaded)
   const toggleTheme = useAppStore((s) => s.toggleTheme)
-
-  const themeOptions = useMemo(() => {
-    const set = new Set<string>()
-    for (const node of allNodes) {
-      for (const t of node.themes) set.add(t)
-    }
-    return [...set].sort((a, b) => a.localeCompare(b, 'zh'))
-  }, [allNodes])
 
   if (!open) return null
 
@@ -57,7 +49,12 @@ export function ThemeDrawer() {
             <span className="h-2 w-2 shrink-0 rounded-full bg-accent" />
             全部主题
           </button>
-          {themeOptions.map((name) => {
+          {!themesLoaded ? (
+            <p className="col-span-2 py-4 text-center text-xs text-text-muted">
+              加载主题…
+            </p>
+          ) : null}
+          {themeTagOptions.map((name) => {
             const active = themes.includes(name)
             return (
               <button

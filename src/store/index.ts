@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
 import { normalizeNodes } from '@/lib/normalizeNode'
 import { sortNodesByDate } from '@/lib/sortNodes'
+import { tagThemeOptions } from '@/lib/themeDictionary'
 import type { AnimationNode } from '@/types'
-import type { CountryItem } from '@/types/api'
+import type { CountryItem, ThemeItem } from '@/types/api'
 
 export interface AppStore {
   allNodes: AnimationNode[]
@@ -11,6 +12,10 @@ export interface AppStore {
 
   countryCategories: CountryItem[]
   countryCategoriesLoaded: boolean
+
+  themeItems: ThemeItem[]
+  themeTagOptions: string[]
+  themesLoaded: boolean
 
   era: string
   themes: string[]
@@ -30,6 +35,7 @@ export interface AppStore {
 
   setNodes: (nodes: AnimationNode[]) => void
   setCountryCategories: (categories: CountryItem[]) => void
+  setThemeItems: (items: ThemeItem[]) => void
   setEra: (era: string) => void
   toggleTheme: (theme: string) => void
   toggleCountry: (code: string | 'ALL') => void
@@ -78,6 +84,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
   countryCategories: [],
   countryCategoriesLoaded: false,
 
+  themeItems: [],
+  themeTagOptions: [],
+  themesLoaded: false,
+
   era: 'all',
   themes: [],
   countries: ['CN'],
@@ -95,6 +105,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   setNodes: (nodes) =>
     set({ allNodes: sortNodesByDate(normalizeNodes(nodes)), nodesLoaded: true }),
+
+  setThemeItems: (items) =>
+    set({
+      themeItems: items,
+      themeTagOptions: tagThemeOptions(items),
+      themesLoaded: true,
+    }),
 
   setCountryCategories: (categories) => {
     const codes = categories.map((c) => c.code)

@@ -1,16 +1,11 @@
+import {
+  mapGenreIdsToThemes,
+  type ThemeDictionary,
+} from '@/lib/themeDictionary'
 import type { AnimationNode, CountryCode, EraCode } from '@/types'
 import type { TmdbAnimeRecord } from '@/types/tmdb'
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'
-
-const GENRE_MAP: Record<number, string> = {
-  16: '动画',
-  10759: '动作冒险',
-  35: '喜剧幽默',
-  10765: '科幻奇幻',
-  10751: '家庭合家欢',
-  18: '剧情思考',
-}
 
 const SOURCE_COUNTRY_MAP: Record<string, CountryCode> = {
   CN: 'CN',
@@ -52,13 +47,6 @@ function yearFromFirstAirDate(firstAirDate: string | undefined): number | undefi
   return Number.isNaN(year) ? undefined : year
 }
 
-function mapThemes(genreIds: number[]): string[] {
-  const themes = genreIds
-    .map((gid) => GENRE_MAP[gid])
-    .filter((label): label is string => Boolean(label) && label !== '动画')
-  return themes.length > 0 ? themes : ['经典']
-}
-
 function posterUrl(record: TmdbAnimeRecord): string {
   if (record.full_poster_path) return record.full_poster_path
   if (record.poster_path) return `${TMDB_IMAGE_BASE}${record.poster_path}`
@@ -66,7 +54,10 @@ function posterUrl(record: TmdbAnimeRecord): string {
 }
 
 /** TMDB 原始条目 → 应用内 AnimationNode */
-export function tmdbRecordToNode(record: TmdbAnimeRecord): AnimationNode | null {
+export function tmdbRecordToNode(
+  record: TmdbAnimeRecord,
+  themeDictionary: ThemeDictionary,
+): AnimationNode | null {
   const title = record.name?.trim()
   const cover = posterUrl(record)
   if (!title || !cover) return null
@@ -86,7 +77,7 @@ export function tmdbRecordToNode(record: TmdbAnimeRecord): AnimationNode | null 
     country: mapCountry(record.origin_country),
     era,
     year: yearFromFirstAirDate(record.first_air_date),
-    themes: mapThemes(record.genre_ids ?? []),
+    themes: mapGenreIdsToThemes(record.genre_ids ?? [], themeDictionary),
     cover,
     description: overview || undefined,
     quote: overview
@@ -98,8 +89,11 @@ export function tmdbRecordToNode(record: TmdbAnimeRecord): AnimationNode | null 
   }
 }
 
-export function tmdbRecordsToNodes(records: TmdbAnimeRecord[]): AnimationNode[] {
+export function tmdbRecordsToNodes(
+  records: TmdbAnimeRecord[],
+  themeDictionary: ThemeDictionary,
+): AnimationNode[] {
   return records
-    .map(tmdbRecordToNode)
+    .map((record) => tmdbRecordToNode(record, themeDictionary))
     .filter((node): node is AnimationNode => node !== null)
 }

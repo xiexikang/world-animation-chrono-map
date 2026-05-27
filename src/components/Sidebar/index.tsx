@@ -1,21 +1,13 @@
-import { useMemo } from 'react'
 import { themeColor } from '@/constants'
 import { useAppStore } from '@/store'
 
 export function Sidebar() {
   const sidebarOpen = useAppStore((s) => s.sidebarOpen)
   const themes = useAppStore((s) => s.themes)
-  const allNodes = useAppStore((s) => s.allNodes)
+  const themeTagOptions = useAppStore((s) => s.themeTagOptions)
+  const themesLoaded = useAppStore((s) => s.themesLoaded)
   const toggleTheme = useAppStore((s) => s.toggleTheme)
   const setSidebarOpen = useAppStore((s) => s.setSidebarOpen)
-
-  const themeOptions = useMemo(() => {
-    const set = new Set<string>()
-    for (const node of allNodes) {
-      for (const t of node.themes) set.add(t)
-    }
-    return [...set].sort((a, b) => a.localeCompare(b, 'zh'))
-  }, [allNodes])
 
   const selectedCount = themes.length
 
@@ -69,7 +61,10 @@ export function Sidebar() {
           />
           <span>全部主题</span>
         </button>
-        {themeOptions.map((name) => {
+        {!themesLoaded ? (
+          <p className="px-2 py-4 text-xs text-text-muted">加载主题…</p>
+        ) : null}
+        {themeTagOptions.map((name) => {
           const active = themes.includes(name)
           return (
             <button

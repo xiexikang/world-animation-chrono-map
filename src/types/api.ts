@@ -35,6 +35,16 @@ export interface AnimeListParams {
   sort_order?: AnimeSortOrder
 }
 
+/** 与后端 ThemeItem 字段一致 */
+export interface ThemeItem {
+  tmdb_genre_id: number
+  name: string
+  sort_order: number
+  show_in_tags: boolean
+  created_at: string
+  updated_at: string
+}
+
 /** 与后端 CountryItem 字段一致 */
 export interface CountryItem {
   code: string

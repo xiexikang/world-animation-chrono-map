@@ -33,6 +33,7 @@ function App() {
   const countryCategoriesLoaded = useAppStore(
     (s) => s.countryCategoriesLoaded,
   )
+  const countryStatsLoaded = useAppStore((s) => s.countryStatsLoaded)
   const setCountryCategories = useAppStore((s) => s.setCountryCategories)
   const setCountryStats = useAppStore((s) => s.setCountryStats)
   const setThemeItems = useAppStore((s) => s.setThemeItems)
@@ -124,6 +125,17 @@ function App() {
       cancelCountryPrefetch()
     }
   }, [countries, themeItems, themesLoaded])
+
+  /** stats 晚于首屏国家就绪时补一次预拉调度 */
+  useEffect(() => {
+    if (!useAppStore.getState().countryStatsLoaded || !themesLoaded) return
+
+    const scope = countryScopeKey(countries)
+    if (!isCountryScopeReady(scope)) return
+
+    const countryCode = countries.length === 1 ? countries[0] : undefined
+    scheduleCountryPrefetch(countryCode)
+  }, [countryStatsLoaded, themesLoaded, countries])
 
   useEffect(() => {
     if (isDesktop) {

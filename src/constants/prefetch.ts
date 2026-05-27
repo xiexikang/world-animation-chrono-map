@@ -1,5 +1,5 @@
-/** 首屏当前国加载完成后，空闲时预拉的国家（按顺序、一次一国） */
-export const PREFETCH_COUNTRY_CODES = ['JP', 'US'] as const
+/** 首屏默认展示的数据源国家 */
+export const DEFAULT_BOOT_COUNTRY_CODE = 'CN'
 
 /** requestIdleCallback 最长等待（毫秒） */
 export const PREFETCH_IDLE_TIMEOUT_MS = 8_000

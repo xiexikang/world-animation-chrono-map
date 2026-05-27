@@ -50,5 +50,6 @@ pnpm dev
 - 二次打开先读缓存再请求 `POST /api/animes/meta` 校验
 - 校验通过则不再拉全量；数据变更或超过 24h 则后台重新同步
 - 首屏可交互后，顶部会显示**后台同步**进度条
-- CN 加载完成后，空闲时自动预拉 **JP / US**（不占用同步进度条）
+- 默认展示 **CN**；可在 `.env` 用 `VITE_ENABLE_COUNTRY_PREFETCH=false` 关闭空闲预拉
+- 开启时：CN 就绪后按 **countries/stats** 预拉其余国家（作品数多的优先，不占用同步进度条）
 - 分页合并时延迟排序，整国加载完成后再统一 `sortNodesByDate`

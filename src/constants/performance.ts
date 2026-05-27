@@ -2,4 +2,4 @@
 export const MAX_GLOBE_MARKERS = 100
 
 /** 右侧国家面板每页作品数 */
-export const PANEL_NODES_PAGE_SIZE = 50
+export const PANEL_NODES_PAGE_SIZE = 100

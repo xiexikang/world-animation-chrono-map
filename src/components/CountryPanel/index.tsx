@@ -39,6 +39,9 @@ export function CountryPanel() {
   const countryStats = useAppStore((s) => s.countryStats)
   const countryStatsLoaded = useAppStore((s) => s.countryStatsLoaded)
   const detailCardId = useAppStore((s) => s.detailCardId)
+  const era = useAppStore((s) => s.era)
+  const themes = useAppStore((s) => s.themes)
+  const searchQuery = useAppStore((s) => s.searchQuery)
   const visibleSet = useVisibleSet()
   const [query, setQuery] = useState('')
   const [listLimit, setListLimit] = useState(PANEL_NODES_PAGE_SIZE)
@@ -70,7 +73,7 @@ export function CountryPanel() {
 
   useEffect(() => {
     setListLimit(PANEL_NODES_PAGE_SIZE)
-  }, [selected, q, visibleSet])
+  }, [selected, q, era, themes, searchQuery])
 
   const displayNodes = useMemo(
     () => countryNodes.slice(0, listLimit),

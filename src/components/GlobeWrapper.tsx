@@ -91,7 +91,10 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
       const store = useAppStore.getState()
       const node = store.allNodes.find((n) => String(n.id) === nodeId)
 
-      if (node?.countryCode) {
+      if (
+        node?.countryCode &&
+        store.countries[0] !== node.countryCode
+      ) {
         store.toggleCountry(node.countryCode)
       }
 

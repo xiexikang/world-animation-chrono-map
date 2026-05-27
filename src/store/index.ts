@@ -1,15 +1,21 @@
 import { create } from 'zustand'
+import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
 import { normalizeNodes } from '@/lib/normalizeNode'
 import { sortNodesByDate } from '@/lib/sortNodes'
-import type { AnimationNode, CountryCode } from '@/types'
+import type { AnimationNode } from '@/types'
+import type { CountryItem } from '@/types/api'
 
 export interface AppStore {
   allNodes: AnimationNode[]
   nodesLoaded: boolean
 
+  countryCategories: CountryItem[]
+  countryCategoriesLoaded: boolean
+
   era: string
   themes: string[]
-  countries: CountryCode[]
+  /** 选中的数据源国家码（/api/countries），空数组表示全部 */
+  countries: string[]
   searchQuery: string
 
   zoom: number
@@ -23,9 +29,10 @@ export interface AppStore {
   mobileThemeOpen: boolean
 
   setNodes: (nodes: AnimationNode[]) => void
+  setCountryCategories: (categories: CountryItem[]) => void
   setEra: (era: string) => void
   toggleTheme: (theme: string) => void
-  toggleCountry: (code: CountryCode | 'ALL') => void
+  toggleCountry: (code: string | 'ALL') => void
   setSearchQuery: (q: string) => void
   setFocusedId: (id: string | null) => void
   setDetailCard: (id: string | null) => void
@@ -41,14 +48,15 @@ function matchesFilters(
   node: AnimationNode,
   era: string,
   themes: string[],
-  countries: CountryCode[],
+  countries: string[],
   searchQuery: string,
 ): boolean {
   const eraMatch = era === 'all' || node.era === era
   const themeMatch =
     themes.length === 0 || themes.some((t) => node.themes.includes(t))
   const countryMatch =
-    countries.length === 0 || countries.includes(node.country)
+    countries.length === 0 ||
+    countries.some((code) => nodeMatchesSourceCountry(node, code))
   const q = searchQuery.trim().toLowerCase()
   const searchMatch =
     q === '' ||
@@ -57,9 +65,18 @@ function matchesFilters(
   return eraMatch && themeMatch && countryMatch && searchMatch
 }
 
+function defaultSelectedCountry(codes: string[]): string[] {
+  if (codes.length === 0) return []
+  if (codes.includes('CN')) return ['CN']
+  return [codes[0]!]
+}
+
 export const useAppStore = create<AppStore>((set, get) => ({
   allNodes: [],
   nodesLoaded: false,
+
+  countryCategories: [],
+  countryCategoriesLoaded: false,
 
   era: 'all',
   themes: [],
@@ -78,6 +95,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   setNodes: (nodes) =>
     set({ allNodes: sortNodesByDate(normalizeNodes(nodes)), nodesLoaded: true }),
+
+  setCountryCategories: (categories) => {
+    const codes = categories.map((c) => c.code)
+    const current = get().countries[0]
+    const next =
+      current && codes.includes(current)
+        ? [current]
+        : defaultSelectedCountry(codes)
+    set({
+      countryCategories: categories,
+      countryCategoriesLoaded: true,
+      countries: next,
+    })
+  },
 
   setEra: (era) => set({ era }),
 
@@ -113,8 +144,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   setCanvasTransform: (zoom, panX, panY) => set({ zoom, panX, panY }),
 
-  resetFilters: () =>
-    set({ era: 'all', themes: [], countries: ['CN'], searchQuery: '' }),
+  resetFilters: () => {
+    const codes = get().countryCategories.map((c) => c.code)
+    set({
+      era: 'all',
+      themes: [],
+      countries: defaultSelectedCountry(codes),
+      searchQuery: '',
+    })
+  },
 
   getVisibleSet: () => {
     const { allNodes, era, themes, countries, searchQuery } = get()

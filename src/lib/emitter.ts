@@ -1,11 +1,11 @@
 import mitt from 'mitt'
-import type { CountryCode } from '@/types'
 
 export type CanvasEvents = {
   'node:click': string
   'node:focus': string
   'canvas:reset': void
-  'country:focus': CountryCode | 'ALL'
+  /** 数据源国家码（/api/countries） */
+  'country:focus': string | 'ALL'
 }
 
 export const canvasEmitter = mitt<CanvasEvents>()

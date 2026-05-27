@@ -82,6 +82,7 @@ export function tmdbRecordToNode(record: TmdbAnimeRecord): AnimationNode | null 
     id,
     title,
     titleEn: record.original_name !== record.name ? record.original_name : undefined,
+    countryCode: record.country_code?.toUpperCase(),
     country: mapCountry(record.origin_country),
     era,
     year: yearFromFirstAirDate(record.first_air_date),

@@ -9,12 +9,14 @@ import { Timeline } from '@/components/Timeline'
 import { TopBar } from '@/components/TopBar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { loadAnimationNodes } from '@/lib/loadAnimationData'
+import { loadCountryCategories } from '@/lib/loadCountryCategories'
 import { useAppStore } from '@/store'
 
 function App() {
   const allNodes = useAppStore((s) => s.allNodes)
   const nodesLoaded = useAppStore((s) => s.nodesLoaded)
   const setNodes = useAppStore((s) => s.setNodes)
+  const setCountryCategories = useAppStore((s) => s.setCountryCategories)
   const setSidebarOpen = useAppStore((s) => s.setSidebarOpen)
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const isTablet = useMediaQuery('(min-width: 768px)')
@@ -27,6 +29,10 @@ function App() {
   useEffect(() => {
     setLoadError(null)
     setLoadProgress(null)
+    void loadCountryCategories()
+      .then(setCountryCategories)
+      .catch((err) => console.error('加载国家分类失败:', err))
+
     loadAnimationNodes((loaded, total) => setLoadProgress({ loaded, total }))
       .then(setNodes)
       .catch((err) => {
@@ -35,7 +41,7 @@ function App() {
         setLoadError(message)
         console.error('加载动画数据失败:', err)
       })
-  }, [setNodes])
+  }, [setNodes, setCountryCategories])
 
   useEffect(() => {
     if (isDesktop) {

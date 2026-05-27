@@ -1,4 +1,5 @@
 import type { CountryCode } from '@/types'
+import type { CountryItem } from '@/types/api'
 
 export const COLORS = {
   bg: 0x0b0b0e,
@@ -17,8 +18,17 @@ export const COUNTRY_LABELS: Record<
   OTHER: { label: '其他', flag: '🌍', en: 'Other' },
 }
 
-/** 右侧国家面板可选国家 */
+/** 右侧国家面板可选国家（仅静态数据无后端时的兜底） */
 export const FILTER_COUNTRIES: CountryCode[] = ['CN', 'JP', 'US', 'EU', 'UK']
+
+/** 无后端 /api/countries 时的兜底分类 */
+export const FALLBACK_COUNTRY_CATEGORIES: CountryItem[] = [
+  { code: 'CN', name: '中国', sort_order: 1, created_at: '', updated_at: '' },
+  { code: 'JP', name: '日本', sort_order: 2, created_at: '', updated_at: '' },
+  { code: 'US', name: '美国', sort_order: 3, created_at: '', updated_at: '' },
+  { code: 'GB', name: '英国', sort_order: 4, created_at: '', updated_at: '' },
+  { code: 'FR', name: '法国', sort_order: 5, created_at: '', updated_at: '' },
+]
 
 /** 年代筛选（与 animations_100_with_covers 一致） */
 export const ERA_OPTIONS: { value: string; label: string }[] = [

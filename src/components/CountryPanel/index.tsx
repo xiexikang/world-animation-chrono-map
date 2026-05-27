@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import { COUNTRY_LABELS, FILTER_COUNTRIES } from '@/constants'
+import { COUNTRY_LABELS } from '@/constants'
 import { LazyCoverImage } from '@/components/LazyCoverImage'
 import { PANEL_NODES_PAGE_SIZE } from '@/constants/performance'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
+import { getCountryDisplayMeta } from '@/lib/countryMeta'
 import { canvasEmitter } from '@/lib/emitter'
+import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { useAppStore } from '@/store'
-import type { AnimationNode, CountryCode } from '@/types'
+import type { AnimationNode } from '@/types'
+import type { CountryItem } from '@/types/api'
 
 function topTheme(nodes: AnimationNode[]): string {
   const counts = new Map<string, number>()
@@ -19,7 +22,7 @@ function topTheme(nodes: AnimationNode[]): string {
   return sorted[0]?.[0] ?? '—'
 }
 
-function selectCountry(code: CountryCode | 'ALL') {
+function selectCountry(code: string | 'ALL') {
   useAppStore.getState().toggleCountry(code)
   canvasEmitter.emit('country:focus', code)
 }
@@ -30,6 +33,8 @@ function focusNode(id: string) {
 
 export function CountryPanel() {
   const countries = useAppStore((s) => s.countries)
+  const countryCategories = useAppStore((s) => s.countryCategories)
+  const countryCategoriesLoaded = useAppStore((s) => s.countryCategoriesLoaded)
   const allNodes = useAppStore((s) => s.allNodes)
   const detailCardId = useAppStore((s) => s.detailCardId)
   const visibleSet = useVisibleSet()
@@ -40,18 +45,25 @@ export function CountryPanel() {
   const q = query.trim().toLowerCase()
 
   const countsByCountry = useMemo(() => {
-    const map = new Map<CountryCode, number>()
+    const map = new Map<string, number>()
+    for (const category of countryCategories) {
+      map.set(category.code, 0)
+    }
     for (const node of allNodes) {
-      map.set(node.country, (map.get(node.country) ?? 0) + 1)
+      for (const category of countryCategories) {
+        if (nodeMatchesSourceCountry(node, category.code)) {
+          map.set(category.code, (map.get(category.code) ?? 0) + 1)
+        }
+      }
     }
     return map
-  }, [allNodes])
+  }, [allNodes, countryCategories])
 
   const countryNodes = useMemo(() => {
     if (!selected) return []
     const filtered = allNodes.filter(
       (node) =>
-        node.country === selected &&
+        nodeMatchesSourceCountry(node, selected) &&
         visibleSet.has(node.id) &&
         (q === '' ||
           node.title.toLowerCase().includes(q) ||
@@ -70,19 +82,32 @@ export function CountryPanel() {
     [countryNodes, listLimit],
   )
 
-  const filteredCountries = useMemo(() => {
-    return FILTER_COUNTRIES.filter((code) => {
+  const filteredCategories = useMemo(() => {
+    return countryCategories.filter((item) => {
       if (!q) return true
-      const { label, en } = COUNTRY_LABELS[code]
+      const meta = getCountryDisplayMeta(item.code, countryCategories)
       return (
-        label.toLowerCase().includes(q) ||
-        en.toLowerCase().includes(q) ||
-        code.toLowerCase().includes(q)
+        meta.label.toLowerCase().includes(q) ||
+        meta.en.toLowerCase().includes(q) ||
+        item.code.toLowerCase().includes(q)
       )
     })
-  }, [q])
+  }, [countryCategories, q])
 
-  const meta = selected ? COUNTRY_LABELS[selected] : null
+  const meta = selected
+    ? getCountryDisplayMeta(selected, countryCategories)
+    : null
+
+  if (!countryCategoriesLoaded) {
+    return (
+      <aside
+        className="float-panel fixed top-[4.25rem] right-3 bottom-[4.75rem] z-30 flex w-[280px] items-center justify-center text-sm text-text-muted max-md:w-[min(calc(100vw-1.5rem),280px)]"
+        aria-label="国家筛选"
+      >
+        加载国家分类…
+      </aside>
+    )
+  }
 
   return (
     <aside
@@ -99,16 +124,16 @@ export function CountryPanel() {
         <CountryPill
           active={!selected}
           onClick={() => selectCountry('ALL')}
-          label="全"
+          label="全部"
           title="全部国家"
         />
-        {FILTER_COUNTRIES.map((code) => (
+        {countryCategories.map((item) => (
           <CountryPill
-            key={code}
-            active={selected === code}
-            onClick={() => selectCountry(code)}
-            label={COUNTRY_LABELS[code].flag}
-            title={COUNTRY_LABELS[code].label}
+            key={item.code}
+            active={selected === item.code}
+            onClick={() => selectCountry(item.code)}
+            label={item.name}
+            title={item.name}
           />
         ))}
       </nav>
@@ -167,7 +192,8 @@ export function CountryPanel() {
         </>
       ) : (
         <CountryBrowse
-          countries={filteredCountries}
+          categories={filteredCategories}
+          allCategories={countryCategories}
           countsByCountry={countsByCountry}
           total={allNodes.length}
           onSelect={selectCountry}
@@ -200,13 +226,12 @@ function PanelSearch({
 function CountryHeader({
   meta,
 }: {
-  meta: (typeof COUNTRY_LABELS)[CountryCode]
+  meta: ReturnType<typeof getCountryDisplayMeta>
 }) {
   return (
     <div className="min-w-0 flex-1">
       <p className="truncate text-base font-semibold">
-        {meta.flag} {meta.en}{' '}
-        <span className="text-text-muted">{meta.label}</span>
+        {meta.flag} {meta.label}
       </p>
     </div>
   )
@@ -239,7 +264,7 @@ function CountryPill({
       aria-checked={active}
       title={title}
       onClick={onClick}
-      className={`flex h-8 min-w-8 shrink-0 items-center justify-center rounded-full px-2.5 text-sm transition ${
+      className={`flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-xs transition ${
         active
           ? 'bg-accent font-medium text-bg shadow-[0_0_12px_rgba(255,107,1,0.35)]'
           : 'border border-white/10 bg-white/5 text-text-muted hover:bg-white/10 hover:text-text'
@@ -334,32 +359,34 @@ function NodeAvatar({
 }
 
 function CountryBrowse({
-  countries,
+  categories,
+  allCategories,
   countsByCountry,
   total,
   onSelect,
 }: {
-  countries: CountryCode[]
-  countsByCountry: Map<CountryCode, number>
+  categories: CountryItem[]
+  allCategories: CountryItem[]
+  countsByCountry: Map<string, number>
   total: number
-  onSelect: (code: CountryCode) => void
+  onSelect: (code: string) => void
 }) {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
       <div className="mb-3 grid grid-cols-2 gap-2">
         <StatBox label="全球作品" value={`${total}`} />
-        <StatBox label="国家/地区" value={`${FILTER_COUNTRIES.length}`} />
+        <StatBox label="国家/地区" value={`${allCategories.length}`} />
       </div>
       <p className="mb-2 text-xs text-text-muted">选择国家/地区</p>
       <ul className="flex flex-col gap-1.5">
-        {countries.map((code) => {
-          const meta = COUNTRY_LABELS[code]
-          const count = countsByCountry.get(code) ?? 0
+        {categories.map((item) => {
+          const meta = getCountryDisplayMeta(item.code, allCategories)
+          const count = countsByCountry.get(item.code) ?? 0
           return (
-            <li key={code}>
+            <li key={item.code}>
               <button
                 type="button"
-                onClick={() => onSelect(code)}
+                onClick={() => onSelect(item.code)}
                 className="flex w-full items-center gap-3 rounded-lg border border-white/10 bg-black/15 px-3 py-2.5 text-left transition hover:border-accent/40 hover:bg-white/5"
               >
                 <span className="text-2xl">{meta.flag}</span>

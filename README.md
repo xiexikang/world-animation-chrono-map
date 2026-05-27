@@ -30,7 +30,7 @@ pnpm dev
 
 ## 数据
 
-- **运行时**：默认从后端 `POST /api/animes` 分页拉取全量数据（开发走 Vite `/api` 代理 → `http://127.0.0.1:8110`）
+- **运行时**：默认从后端 `POST /api/animes` 分页拉取全量数据；国家分类来自 `GET /api/countries`（开发走 Vite `/api` 代理 → `http://127.0.0.1:8110`）
 - `src/data/animationData.json` — 本地 TMDB 结构备份；设置 `VITE_USE_STATIC_DATA=true` 时可离线加载
 - `src/data/raw_anime_CN.json` — 中国动画源数据；同步到 animationData：`pnpm data:sync-animation`
 - `public/data/nodes.json` — 可选导出（`pnpm data:tmdb-to-nodes`），运行时不再使用

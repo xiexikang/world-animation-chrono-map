@@ -35,6 +35,15 @@ export interface AnimeListParams {
   sort_order?: AnimeSortOrder
 }
 
+/** 与后端 CountryItem 字段一致 */
+export interface CountryItem {
+  code: string
+  name: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
 /** 与后端 AnimeItem 字段一致 */
 export interface AnimeItem {
   tmdb_id: number

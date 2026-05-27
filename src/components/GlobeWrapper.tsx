@@ -2,11 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { MAX_GLOBE_MARKERS } from '@/constants/performance'
-import {
-  buildNodeLatLngMap,
-  getCountryGlobeCenter,
-  resolveNodeLatLng,
-} from '@/globe/countryRegions'
+import { buildNodeLatLngMap, resolveNodeLatLng } from '@/globe/countryRegions'
 import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
 import type { LatLng } from '@/globe/geo'
 import {
@@ -22,12 +18,15 @@ import {
   GlobeScene,
   type GlobeSceneHandle,
 } from '@/globe/GlobeScene'
-import { FILTER_COUNTRIES } from '@/constants'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
 import { loadCoverTexture } from '@/lib/loadCoverTexture'
+import {
+  getSourceCountryGlobeCenter,
+  sourceCountriesToGlobeRegions,
+} from '@/lib/sourceCountry'
 import { useAppStore } from '@/store'
-import type { AnimationNode, CountryCode } from '@/types'
+import type { AnimationNode } from '@/types'
 
 interface GlobeWrapperProps {
   nodes: AnimationNode[]
@@ -36,7 +35,11 @@ interface GlobeWrapperProps {
 export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
   const visibleSet = useVisibleSet()
   const focusedId = useAppStore((s) => s.focusedId)
-  const highlightCountries = useAppStore((s) => s.countries)
+  const selectedSourceCountries = useAppStore((s) => s.countries)
+  const highlightCountries = useMemo(
+    () => sourceCountriesToGlobeRegions(selectedSourceCountries),
+    [selectedSourceCountries],
+  )
   const [latLngMap, setLatLngMap] = useState<Map<string, LatLng> | null>(null)
   const [geoReady, setGeoReady] = useState(false)
   const sceneRef = useRef<GlobeSceneHandle>(null)
@@ -80,8 +83,8 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
       const store = useAppStore.getState()
       const node = store.allNodes.find((n) => String(n.id) === nodeId)
 
-      if (node && FILTER_COUNTRIES.includes(node.country)) {
-        store.toggleCountry(node.country)
+      if (node?.countryCode) {
+        store.toggleCountry(node.countryCode)
       }
 
       const controls = sceneRef.current?.controls
@@ -118,7 +121,7 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
       useAppStore.getState().setDetailCard(null)
     }
 
-    const onCountryFocus = (code: CountryCode | 'ALL') => {
+    const onCountryFocus = (code: string | 'ALL') => {
       const controls = sceneRef.current?.controls
       const camera = cameraRef.current
       if (!controls || !camera) return
@@ -133,7 +136,7 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
         return
       }
 
-      void getCountryGlobeCenter(code).then((center) => {
+      void getSourceCountryGlobeCenter(code).then((center) => {
         if (!sceneRef.current?.controls || !cameraRef.current) return
         focusGlobeOnLatLng(cameraRef.current, sceneRef.current.controls, center)
       })

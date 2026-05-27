@@ -7,6 +7,8 @@ export interface AnimationNode {
   id: string
   title: string
   titleEn?: string
+  /** 后端数据源国家码（/api/countries） */
+  countryCode?: string
   country: CountryCode
   era: EraCode
   year?: number

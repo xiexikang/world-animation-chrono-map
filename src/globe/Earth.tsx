@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { Suspense, useMemo, useRef } from 'react'
 import { MeshTransmissionMaterial, useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import {
@@ -192,7 +192,22 @@ function GlassAtmosphere() {
   )
 }
 
-export function Earth() {
+function FallbackEarthSurface() {
+  return (
+    <mesh renderOrder={1}>
+      <sphereGeometry args={[0.986, 48, 48]} />
+      <meshStandardMaterial
+        color="#1a3a6e"
+        emissive="#2a5aa8"
+        emissiveIntensity={0.8}
+        roughness={0.9}
+        metalness={0.05}
+      />
+    </mesh>
+  )
+}
+
+function EarthWithTexture() {
   const [colorMap] = useTexture([EARTH_MAP])
 
   return (
@@ -203,5 +218,13 @@ export function Earth() {
       <GlassShell />
       <GlassAtmosphere />
     </group>
+  )
+}
+
+export function Earth() {
+  return (
+    <Suspense fallback={<FallbackEarthSurface />}>
+      <EarthWithTexture />
+    </Suspense>
   )
 }

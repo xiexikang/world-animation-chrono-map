@@ -17,6 +17,9 @@ import { useAppStore } from '@/store'
 function App() {
   const allNodes = useAppStore((s) => s.allNodes)
   const nodesLoaded = useAppStore((s) => s.nodesLoaded)
+  const countries = useAppStore((s) => s.countries)
+  const themeItems = useAppStore((s) => s.themeItems)
+  const themesLoaded = useAppStore((s) => s.themesLoaded)
   const setNodes = useAppStore((s) => s.setNodes)
   const setCountryCategories = useAppStore((s) => s.setCountryCategories)
   const setThemeItems = useAppStore((s) => s.setThemeItems)
@@ -32,41 +35,57 @@ function App() {
   useEffect(() => {
     let cancelled = false
 
-    async function bootstrap() {
+    void Promise.all([fetchCountries(), fetchThemes()])
+      .then(([countryList, themeList]) => {
+        if (cancelled) return
+        setCountryCategories(countryList)
+        setThemeItems(themeList)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        const message =
+          err instanceof Error ? err.message : '加载分类数据失败'
+        setLoadError(message)
+        console.error('加载分类数据失败:', err)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [setCountryCategories, setThemeItems])
+
+  useEffect(() => {
+    if (!themesLoaded || themeItems.length === 0) return
+
+    let cancelled = false
+    const countryCode = countries.length === 1 ? countries[0] : undefined
+
+    async function loadNodes() {
       setLoadError(null)
       setLoadProgress(null)
       try {
-        const [countries, themeItems] = await Promise.all([
-          fetchCountries(),
-          fetchThemes(),
-        ])
-        if (cancelled) return
-
-        setCountryCategories(countries)
-        setThemeItems(themeItems)
-
         const themeDictionary = buildThemeDictionary(themeItems)
         const nodes = await loadAnimationNodes(
           (loaded, total) => setLoadProgress({ loaded, total }),
           themeDictionary,
+          countryCode,
         )
         if (cancelled) return
-
         setNodes(nodes)
       } catch (err) {
         if (cancelled) return
         const message =
-          err instanceof Error ? err.message : '加载数据失败'
+          err instanceof Error ? err.message : '加载动画数据失败'
         setLoadError(message)
-        console.error('加载数据失败:', err)
+        console.error('加载动画数据失败:', err)
       }
     }
 
-    void bootstrap()
+    void loadNodes()
     return () => {
       cancelled = true
     }
-  }, [setNodes, setCountryCategories, setThemeItems])
+  }, [countries, themeItems, themesLoaded, setNodes])
 
   useEffect(() => {
     if (isDesktop) {
@@ -76,22 +95,32 @@ function App() {
     }
   }, [isDesktop, isTablet, setSidebarOpen])
 
+  const selectedCountry = countries.length === 1 ? countries[0] : null
+
   return (
     <div className="relative h-full w-full overflow-hidden bg-bg text-text">
       <div className="fixed inset-0 z-0">
+        <GlobeWrapper nodes={allNodes} />
+
         {!nodesLoaded ? (
-          <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center text-sm text-text-muted">
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-bg/55 px-6 text-center text-sm text-text-muted backdrop-blur-[2px]">
             {loadError ? (
               <>
-                <p className="text-accent">无法连接后端</p>
-                <p className="max-w-md text-xs leading-relaxed">{loadError}</p>
+                <p className="pointer-events-auto text-accent">无法连接后端</p>
+                <p className="pointer-events-auto max-w-md text-xs leading-relaxed">
+                  {loadError}
+                </p>
                 <p className="text-xs opacity-80">
                   请确认后端已启动（默认 http://127.0.0.1:8110）
                 </p>
               </>
             ) : (
               <>
-                <p>加载动画数据…</p>
+                <p>
+                  {selectedCountry
+                    ? `加载${selectedCountry}动画数据…`
+                    : '加载全球动画数据…'}
+                </p>
                 {loadProgress?.total != null && loadProgress.total > 0 ? (
                   <p className="text-xs opacity-80">
                     {loadProgress.loaded} / {loadProgress.total}
@@ -102,9 +131,7 @@ function App() {
               </>
             )}
           </div>
-        ) : (
-          <GlobeWrapper nodes={allNodes} />
-        )}
+        ) : null}
       </div>
 
       <TopBar />

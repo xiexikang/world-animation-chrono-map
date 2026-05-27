@@ -75,10 +75,12 @@ export function animeItemToNode(
   const genreIds = toNumberArray(item.genre_ids ?? [])
 
   return {
-    id: `tmdb-${item.tmdb_id}-${item.country_code}`,
+    id: item.country_code
+      ? `tmdb-${item.tmdb_id}-${item.country_code}`
+      : `tmdb-${item.tmdb_id}`,
     title,
     titleEn: item.original_name !== item.name ? item.original_name : undefined,
-    countryCode: item.country_code.toUpperCase(),
+    countryCode: item.country_code?.toUpperCase(),
     country: mapRegion(item.origin_country ?? []),
     era,
     year,
@@ -107,9 +109,11 @@ export function animeItemsToNodes(
 export async function loadAnimationNodes(
   onProgress?: LoadProgress,
   themeDictionary?: ThemeDictionary,
+  countryCode?: string,
 ): Promise<AnimationNode[]> {
   const dictionary =
     themeDictionary ?? buildThemeDictionary(await fetchThemes())
-  const items = await fetchAllAnimeItems(onProgress)
+  const filters = countryCode ? { country_code: countryCode } : {}
+  const items = await fetchAllAnimeItems(onProgress, filters)
   return animeItemsToNodes(items, dictionary)
 }

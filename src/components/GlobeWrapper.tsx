@@ -60,12 +60,20 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
     }
     let cancelled = false
     setGeoReady(false)
-    void buildNodeLatLngMap(globeNodes).then((map) => {
-      if (!cancelled) {
-        setLatLngMap(map)
-        setGeoReady(true)
-      }
-    })
+    void buildNodeLatLngMap(globeNodes)
+      .then((map) => {
+        if (!cancelled) {
+          setLatLngMap(map)
+          setGeoReady(true)
+        }
+      })
+      .catch((err) => {
+        console.error('布置地球标记失败:', err)
+        if (!cancelled) {
+          setLatLngMap(new Map())
+          setGeoReady(true)
+        }
+      })
     return () => {
       cancelled = true
     }

@@ -31,18 +31,19 @@ export async function fetchAnimeDetail(
 
 export type LoadProgress = (loaded: number, total: number | null) => void
 
-/** 分页拉取全部动画（地球与侧栏依赖全量客户端筛选） */
+/** 分页拉取动画（可按国家筛选） */
 export async function fetchAllAnimeItems(
   onProgress?: LoadProgress,
+  filters: Omit<AnimeListParams, 'page' | 'page_size'> = {},
 ): Promise<AnimeItem[]> {
-  const first = await fetchAnimePage({ page: 1, page_size: PAGE_SIZE })
+  const first = await fetchAnimePage({ page: 1, page_size: PAGE_SIZE, ...filters })
   const total = first.pagination.total
   const totalPages = first.pagination.total_pages
   const items = [...first.items]
   onProgress?.(items.length, total)
 
   for (let page = 2; page <= totalPages; page += 1) {
-    const next = await fetchAnimePage({ page, page_size: PAGE_SIZE })
+    const next = await fetchAnimePage({ page, page_size: PAGE_SIZE, ...filters })
     items.push(...next.items)
     onProgress?.(items.length, total)
   }

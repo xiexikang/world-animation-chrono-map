@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
-import { replaceCountryNodes, storeHasCountryScope } from '@/lib/mergeNodes'
+import {
+  mergeNodesById,
+  replaceCountryNodes,
+  storeHasCountryScope,
+} from '@/lib/mergeNodes'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { tagThemeOptions } from '@/lib/themeDictionary'
 import type { AnimationNode } from '@/types'
@@ -49,7 +53,9 @@ export interface AppStore {
     countryCode: string | undefined,
     nodes: AnimationNode[],
     isFirstBatch: boolean,
+    options?: { sort?: boolean },
   ) => void
+  finalizeCountryNodesSort: () => void
   markCountryScopeLoaded: (scope: string) => void
   beginNodesLoad: () => void
   beginCountryLoad: () => void
@@ -151,18 +157,24 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   mergeNodes: (nodes) =>
     set((state) => ({
-      allNodes: replaceCountryNodes(state.allNodes, undefined, nodes, true),
+      allNodes: mergeNodesById(state.allNodes, nodes),
       nodesLoaded: true,
     })),
 
-  applyCountryNodeBatch: (countryCode, nodes, isFirstBatch) =>
+  applyCountryNodeBatch: (countryCode, nodes, isFirstBatch, options) =>
     set((state) => ({
       allNodes: replaceCountryNodes(
         state.allNodes,
         countryCode,
         nodes,
         isFirstBatch,
+        { sort: options?.sort === true },
       ),
+    })),
+
+  finalizeCountryNodesSort: () =>
+    set((state) => ({
+      allNodes: sortNodesByDate(state.allNodes),
       nodesLoaded: true,
     })),
 

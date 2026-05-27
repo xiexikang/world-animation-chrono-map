@@ -60,6 +60,12 @@ export interface CountryItem {
   updated_at: string
 }
 
+/** GET /api/countries/stats */
+export interface CountryStatItem {
+  code: string
+  total: number
+}
+
 /** 与后端 AnimeItem 字段一致 */
 export interface AnimeItem {
   tmdb_id: number

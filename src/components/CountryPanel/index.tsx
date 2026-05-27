@@ -36,6 +36,8 @@ export function CountryPanel() {
   const countryCategories = useAppStore((s) => s.countryCategories)
   const countryCategoriesLoaded = useAppStore((s) => s.countryCategoriesLoaded)
   const allNodes = useAppStore((s) => s.allNodes)
+  const countryStats = useAppStore((s) => s.countryStats)
+  const countryStatsLoaded = useAppStore((s) => s.countryStatsLoaded)
   const detailCardId = useAppStore((s) => s.detailCardId)
   const visibleSet = useVisibleSet()
   const [query, setQuery] = useState('')
@@ -47,17 +49,10 @@ export function CountryPanel() {
   const countsByCountry = useMemo(() => {
     const map = new Map<string, number>()
     for (const category of countryCategories) {
-      map.set(category.code, 0)
-    }
-    for (const node of allNodes) {
-      for (const category of countryCategories) {
-        if (nodeMatchesSourceCountry(node, category.code)) {
-          map.set(category.code, (map.get(category.code) ?? 0) + 1)
-        }
-      }
+      map.set(category.code, countryStats.get(category.code) ?? 0)
     }
     return map
-  }, [allNodes, countryCategories])
+  }, [countryCategories, countryStats])
 
   const countryNodes = useMemo(() => {
     if (!selected) return []
@@ -195,7 +190,12 @@ export function CountryPanel() {
           categories={filteredCategories}
           allCategories={countryCategories}
           countsByCountry={countsByCountry}
-          total={allNodes.length}
+          statsLoaded={countryStatsLoaded}
+          total={
+            countryStatsLoaded
+              ? [...countsByCountry.values()].reduce((a, b) => a + b, 0)
+              : allNodes.length
+          }
           onSelect={selectCountry}
         />
       )}
@@ -362,12 +362,14 @@ function CountryBrowse({
   categories,
   allCategories,
   countsByCountry,
+  statsLoaded,
   total,
   onSelect,
 }: {
   categories: CountryItem[]
   allCategories: CountryItem[]
   countsByCountry: Map<string, number>
+  statsLoaded: boolean
   total: number
   onSelect: (code: string) => void
 }) {
@@ -395,7 +397,9 @@ function CountryBrowse({
                     {meta.en}{' '}
                     <span className="text-text-muted">{meta.label}</span>
                   </span>
-                  <span className="text-xs text-text-muted">{count} 部作品</span>
+                  <span className="text-xs text-text-muted">
+                    {statsLoaded ? `${count} 部作品` : '…'}
+                  </span>
                 </span>
                 <span className="text-text-muted">›</span>
               </button>

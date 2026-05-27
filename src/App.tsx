@@ -8,14 +8,19 @@ import { ThemeDrawer, ThemeDrawerTrigger } from '@/components/ThemeDrawer'
 import { Timeline } from '@/components/Timeline'
 import { TopBar } from '@/components/TopBar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { fetchCountries } from '@/api/country'
+import { fetchCountries, fetchCountryStats } from '@/api/country'
 import { fetchThemes } from '@/api/theme'
-import { buildAnimeListFilters } from '@/lib/animeListFilters'
-import { loadAnimeWithCache } from '@/lib/loadAnimeWithCache'
+import { countryScopeKey } from '@/lib/animeListFilters'
+import {
+  isCountryScopeReady,
+  loadCountryScope,
+} from '@/lib/loadCountryScope'
+import {
+  cancelCountryPrefetch,
+  scheduleCountryPrefetch,
+} from '@/lib/prefetchCountryScopes'
 import { buildThemeDictionary } from '@/lib/themeDictionary'
 import { useAppStore } from '@/store'
-
-const SEARCH_REFETCH_MS = 400
 
 function App() {
   const allNodes = useAppStore((s) => s.allNodes)
@@ -23,45 +28,30 @@ function App() {
   const nodesSyncing = useAppStore((s) => s.nodesSyncing)
   const nodesLoadProgress = useAppStore((s) => s.nodesLoadProgress)
   const countries = useAppStore((s) => s.countries)
-  const era = useAppStore((s) => s.era)
-  const themes = useAppStore((s) => s.themes)
-  const searchQuery = useAppStore((s) => s.searchQuery)
   const themeItems = useAppStore((s) => s.themeItems)
   const themesLoaded = useAppStore((s) => s.themesLoaded)
   const countryCategoriesLoaded = useAppStore(
     (s) => s.countryCategoriesLoaded,
   )
-  const setNodes = useAppStore((s) => s.setNodes)
-  const mergeNodes = useAppStore((s) => s.mergeNodes)
-  const beginNodesLoad = useAppStore((s) => s.beginNodesLoad)
-  const setNodesSyncing = useAppStore((s) => s.setNodesSyncing)
-  const setNodesLoadProgress = useAppStore((s) => s.setNodesLoadProgress)
   const setCountryCategories = useAppStore((s) => s.setCountryCategories)
+  const setCountryStats = useAppStore((s) => s.setCountryStats)
   const setThemeItems = useAppStore((s) => s.setThemeItems)
   const setSidebarOpen = useAppStore((s) => s.setSidebarOpen)
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const isTablet = useMediaQuery('(min-width: 768px)')
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-
-  useEffect(() => {
-    const timer = setTimeout(
-      () => setDebouncedSearch(searchQuery.trim()),
-      SEARCH_REFETCH_MS,
-    )
-    return () => clearTimeout(timer)
-  }, [searchQuery])
 
   useEffect(() => {
     if (countryCategoriesLoaded && themesLoaded) return
 
     let cancelled = false
 
-    void Promise.all([fetchCountries(), fetchThemes()])
-      .then(([countryList, themeList]) => {
+    void Promise.all([fetchCountries(), fetchThemes(), fetchCountryStats()])
+      .then(([countryList, themeList, stats]) => {
         if (cancelled) return
         setCountryCategories(countryList)
         setThemeItems(themeList)
+        setCountryStats(stats)
       })
       .catch((err) => {
         if (cancelled) return
@@ -79,66 +69,50 @@ function App() {
     themesLoaded,
     setCountryCategories,
     setThemeItems,
+    setCountryStats,
   ])
 
   useEffect(() => {
     if (!themesLoaded || themeItems.length === 0) return
 
+    const scope = countryScopeKey(countries)
+    const countryCode = countries.length === 1 ? countries[0] : undefined
     const controller = new AbortController()
     let cancelled = false
-    let firstBatch = true
 
-    const countryCode = countries.length === 1 ? countries[0] : undefined
-    const apiFilters = buildAnimeListFilters({
-      countryCode,
-      era,
-      themeNames: themes,
-      themeItems,
-      keyword: debouncedSearch,
-    })
+    if (isCountryScopeReady(scope)) {
+      const state = useAppStore.getState()
+      if (!state.nodesLoaded) {
+        useAppStore.setState({ nodesLoaded: true })
+      }
+      if (!state.loadedCountryScopes.has(scope)) {
+        state.markCountryScopeLoaded(scope)
+      }
+      scheduleCountryPrefetch(countryCode)
+      return () => {
+        cancelCountryPrefetch()
+      }
+    }
 
     async function loadNodes() {
-      beginNodesLoad()
       setLoadError(null)
 
       try {
         const themeDictionary = buildThemeDictionary(themeItems)
-
-        await loadAnimeWithCache({
-          signal: controller.signal,
-          filters: apiFilters,
+        await loadCountryScope({
+          countryCode,
           themeDictionary,
-          onCacheHydrate: (nodes, willRefresh) => {
-            if (cancelled) return
-            setNodes(nodes)
-            firstBatch = false
-            if (willRefresh) setNodesSyncing(true)
-          },
-          onProgress: (loaded, total) => {
-            if (!cancelled) setNodesLoadProgress({ loaded, total })
-          },
-          onBatch: (batch) => {
-            if (cancelled || batch.length === 0) return
-            setNodesSyncing(true)
-            if (firstBatch) {
-              setNodes(batch)
-              firstBatch = false
-            } else {
-              mergeNodes(batch)
-            }
-          },
+          signal: controller.signal,
         })
+        if (!cancelled) {
+          scheduleCountryPrefetch(countryCode)
+        }
       } catch (err) {
         if (cancelled || controller.signal.aborted) return
         const message =
           err instanceof Error ? err.message : '加载动画数据失败'
         setLoadError(message)
         console.error('加载动画数据失败:', err)
-      } finally {
-        if (!cancelled) {
-          setNodesSyncing(false)
-          setNodesLoadProgress(null)
-        }
       }
     }
 
@@ -147,20 +121,9 @@ function App() {
     return () => {
       cancelled = true
       controller.abort()
+      cancelCountryPrefetch()
     }
-  }, [
-    countries,
-    themeItems,
-    themesLoaded,
-    era,
-    themes,
-    debouncedSearch,
-    beginNodesLoad,
-    setNodes,
-    mergeNodes,
-    setNodesSyncing,
-    setNodesLoadProgress,
-  ])
+  }, [countries, themeItems, themesLoaded])
 
   useEffect(() => {
     if (isDesktop) {

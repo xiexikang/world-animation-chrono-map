@@ -11,7 +11,7 @@ import {
   type AnimeCacheRecord,
 } from '@/lib/animeCache/types'
 import { checkCacheFreshness } from '@/lib/animeCache/validate'
-import { animeItemsToNodes } from '@/lib/nodes'
+import { animeItemsToNodesAsync } from '@/lib/animeItemsWorker'
 import type { ThemeDictionary } from '@/lib/themeDictionary'
 import type { AnimationNode } from '@/types'
 import type { AnimeItem, AnimeListParams } from '@/types/api'
@@ -29,8 +29,8 @@ export interface LoadAnimeWithCacheOptions {
 function itemsToNodes(
   items: AnimeItem[],
   dictionary: ThemeDictionary,
-): AnimationNode[] {
-  return animeItemsToNodes(items, dictionary)
+): Promise<AnimationNode[]> {
+  return animeItemsToNodesAsync(items, dictionary)
 }
 
 async function persistCache(
@@ -61,13 +61,14 @@ async function fetchFromNetwork(
     onProgress,
     onBatch: onBatch
       ? (pageItems) => {
-          const nodes = itemsToNodes(pageItems, themeDictionary)
-          if (nodes.length > 0) onBatch(nodes)
+          void itemsToNodes(pageItems, themeDictionary).then((nodes) => {
+            if (nodes.length > 0) onBatch(nodes)
+          })
         }
       : undefined,
   })
 
-  const nodes = itemsToNodes(items, themeDictionary)
+  const nodes = await itemsToNodes(items, themeDictionary)
   await persistCache(buildAnimeCacheKey(filters), filters, items)
   return nodes
 }
@@ -81,7 +82,7 @@ export async function loadAnimeWithCache(
   const cached = await readAnimeCache(cacheKey)
 
   if (cached && cached.items.length > 0) {
-    const cachedNodes = itemsToNodes(cached.items, themeDictionary)
+    const cachedNodes = await itemsToNodes(cached.items, themeDictionary)
     const freshness = await checkCacheFreshness(cached, signal)
     if (signal?.aborted) return cachedNodes
 

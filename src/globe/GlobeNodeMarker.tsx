@@ -1,6 +1,6 @@
 import { Billboard } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import type { AnimationNode } from '@/types'
 import { canvasEmitter } from '@/lib/emitter'
@@ -8,7 +8,10 @@ import { loadCoverTexture } from '@/lib/loadCoverTexture'
 import type { LatLng } from './geo'
 import { latLngToNodePosition } from './geo'
 
-/** 球面海报尺寸（世界单位） */
+/** 有海报时的目标透明度；无 map 时保持 0，避免黑块 */
+const OPACITY_COVER = 0.92
+const OPACITY_FOCUSED = 1
+const OPACITY_DIM = 0.18
 const COVER_W = 0.018
 const COVER_H = 0.025
 
@@ -30,27 +33,38 @@ export function GlobeNodeMarker({
   const groupRef = useRef<THREE.Group>(null)
   const matRef = useRef<THREE.MeshBasicMaterial>(null)
   const [x, y, z] = latLngToNodePosition(latLng.lat, latLng.lng)
-  const [texture, setTexture] = useState<THREE.Texture | null>(null)
 
   useEffect(() => {
+    const mat = matRef.current
     if (!visible) {
-      setTexture(null)
-      const mat = matRef.current
       if (mat) {
         mat.map = null
+        mat.opacity = 0
         mat.needsUpdate = true
       }
       return
     }
+
     let alive = true
-    setTexture(null)
+    if (mat) {
+      mat.map = null
+      mat.opacity = 0
+      mat.needsUpdate = true
+    }
+
+    if (!node.cover) {
+      return () => {
+        alive = false
+      }
+    }
+
     void loadCoverTexture(node.cover).then((tex) => {
       if (!alive || !tex) return
-      setTexture(tex)
-      const mat = matRef.current
-      if (mat) {
-        mat.map = tex
-        mat.needsUpdate = true
+      const material = matRef.current
+      if (material) {
+        material.map = tex
+        material.opacity = 0
+        material.needsUpdate = true
       }
     })
     return () => {
@@ -62,11 +76,22 @@ export function GlobeNodeMarker({
     const g = groupRef.current
     const mat = matRef.current
     if (!g || !mat) return
-    const target = focused ? 1.3 : visible ? 1 : 0.75
-    const hasCover = Boolean(texture)
-    const targetOpacity =
-      !hasCover ? 0 : visible ? 1 : focused ? 0.85 : 0.18
-    _scale.set(target, target, target)
+
+    const hasMap = Boolean(mat.map)
+
+    // 无贴图时不渲染，避免加载前出现黑块
+    g.visible = hasMap
+
+    const targetScale = focused ? 1.3 : visible ? 1 : 0.75
+    const targetOpacity = !hasMap
+      ? 0
+      : focused
+        ? OPACITY_FOCUSED
+        : visible
+          ? OPACITY_COVER
+          : OPACITY_DIM
+
+    _scale.set(targetScale, targetScale, targetScale)
     g.scale.lerp(_scale, 0.15)
     mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, 0.12)
   })
@@ -91,10 +116,10 @@ export function GlobeNodeMarker({
           <planeGeometry args={[COVER_W, COVER_H]} />
           <meshBasicMaterial
             ref={matRef}
-            map={texture ?? undefined}
             color={0xffffff}
             transparent
             opacity={0}
+            alphaTest={0.04}
             depthTest
             depthWrite={false}
             toneMapped={false}

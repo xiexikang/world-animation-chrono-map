@@ -8,7 +8,8 @@ import type {
 
 const LIST_PATH = '/api/animes'
 /** 与后端 page_size 上限一致 */
-export const ANIME_PAGE_SIZE = 100
+export const ANIME_PAGE_SIZE = 300
+const LIST_FIELDS: AnimeListParams['fields'] = 'lite'
 /** 首页之后的并发页数上限 */
 const FETCH_CONCURRENCY = 4
 
@@ -21,6 +22,7 @@ export async function fetchAnimePage(
     {
       page: 1,
       page_size: ANIME_PAGE_SIZE,
+      fields: LIST_FIELDS,
       sort_by: 'popularity',
       sort_order: 'desc',
       ...params,
@@ -33,7 +35,7 @@ export async function fetchAnimeListMeta(
   filters: Omit<AnimeListParams, 'page' | 'page_size'>,
   signal?: AbortSignal,
 ): Promise<AnimeListMeta> {
-  return apiPost<AnimeListMeta>(`${LIST_PATH}/meta`, filters, { signal })
+  return apiPost<AnimeListMeta>(`${LIST_PATH}/meta`, { fields: LIST_FIELDS, ...filters }, { signal })
 }
 
 export async function fetchAnimeDetail(

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
+import { scheduleLatLngForNodes } from '@/lib/nodeLatLngCache'
 import {
   mergeNodesById,
   replaceCountryNodes,
@@ -7,6 +7,7 @@ import {
 } from '@/lib/mergeNodes'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { tagThemeOptions } from '@/lib/themeDictionary'
+import { appendVisibleIdsForNodes, buildVisibleState } from '@/store/visibleState'
 import {
   DEFAULT_GLOBE_MARKERS,
   MAX_GLOBE_MARKERS_CAP,
@@ -19,18 +20,20 @@ export { storeHasCountryScope }
 export interface AppStore {
   allNodes: AnimationNode[]
   nodesLoaded: boolean
-  /** 首屏已可交互，仍在拉取或校验剩余数据 */
   nodesSyncing: boolean
   nodesLoadProgress: { loaded: number; total: number | null } | null
-  /** 地球当前展示标记上限（侧栏「加载更多」会同步提高） */
   globeMarkerLimit: number
+
+  visibleIds: Set<string>
+  visibleCount: number
+  nodeCount: number
+  /** 落点缓存更新时递增，供地球组件刷新 */
+  latLngCacheVersion: number
 
   countryCategories: CountryItem[]
   countryCategoriesLoaded: boolean
-  /** 各国作品总数（来自 /api/countries/stats） */
   countryStats: Map<string, number>
   countryStatsLoaded: boolean
-  /** 已从网络/缓存加载完成的国家分片 */
   loadedCountryScopes: Set<string>
 
   themeItems: ThemeItem[]
@@ -39,7 +42,6 @@ export interface AppStore {
 
   era: string
   themes: string[]
-  /** 选中的数据源国家码（/api/countries），空数组表示全部 */
   countries: string[]
   searchQuery: string
 
@@ -59,10 +61,11 @@ export interface AppStore {
     countryCode: string | undefined,
     nodes: AnimationNode[],
     isFirstBatch: boolean,
-    options?: { sort?: boolean },
+    options?: { sort?: boolean; skipVisible?: boolean },
   ) => void
   finalizeCountryNodesSort: () => void
   markCountryScopeLoaded: (scope: string) => void
+  bumpLatLngCache: () => void
   beginNodesLoad: () => void
   beginCountryLoad: () => void
   setCountryStats: (stats: Map<string, number>) => void
@@ -85,28 +88,6 @@ export interface AppStore {
   setMobileThemeOpen: (open: boolean) => void
   setCanvasTransform: (zoom: number, panX: number, panY: number) => void
   resetFilters: () => void
-  getVisibleSet: () => Set<string>
-}
-
-function matchesFilters(
-  node: AnimationNode,
-  era: string,
-  themes: string[],
-  countries: string[],
-  searchQuery: string,
-): boolean {
-  const eraMatch = era === 'all' || node.era === era
-  const themeMatch =
-    themes.length === 0 || themes.some((t) => node.themes.includes(t))
-  const countryMatch =
-    countries.length === 0 ||
-    countries.some((code) => nodeMatchesSourceCountry(node, code))
-  const q = searchQuery.trim().toLowerCase()
-  const searchMatch =
-    q === '' ||
-    node.title.toLowerCase().includes(q) ||
-    (node.titleEn?.toLowerCase().includes(q) ?? false)
-  return eraMatch && themeMatch && countryMatch && searchMatch
 }
 
 function defaultSelectedCountry(codes: string[]): string[] {
@@ -115,12 +96,22 @@ function defaultSelectedCountry(codes: string[]): string[] {
   return [codes[0]!]
 }
 
+function patchVisible(state: AppStore, extra: Partial<AppStore> = {}) {
+  const merged = { ...state, ...extra }
+  return { ...merged, ...buildVisibleState(merged) }
+}
+
 export const useAppStore = create<AppStore>((set, get) => ({
   allNodes: [],
   nodesLoaded: false,
   nodesSyncing: false,
   nodesLoadProgress: null,
   globeMarkerLimit: DEFAULT_GLOBE_MARKERS,
+
+  visibleIds: new Set(),
+  visibleCount: 0,
+  nodeCount: 0,
+  latLngCacheVersion: 0,
 
   countryCategories: [],
   countryCategoriesLoaded: false,
@@ -147,6 +138,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   aboutOpen: false,
   mobileThemeOpen: false,
 
+  bumpLatLngCache: () =>
+    set((state) => ({ latLngCacheVersion: state.latLngCacheVersion + 1 })),
+
   beginNodesLoad: () =>
     set({ nodesLoaded: false, nodesSyncing: true, nodesLoadProgress: null }),
 
@@ -172,31 +166,78 @@ export const useAppStore = create<AppStore>((set, get) => ({
   resetGlobeMarkerLimit: () =>
     set({ globeMarkerLimit: DEFAULT_GLOBE_MARKERS }),
 
-  setNodes: (nodes) =>
-    set({ allNodes: sortNodesByDate(nodes), nodesLoaded: true }),
+  setNodes: (nodes) => {
+    scheduleLatLngForNodes(
+      [...nodes]
+        .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+        .slice(0, 100),
+    )
+    set((state) =>
+      patchVisible(state, {
+        allNodes: sortNodesByDate(nodes),
+        nodesLoaded: true,
+      }),
+    )
+  },
 
-  mergeNodes: (nodes) =>
-    set((state) => ({
-      allNodes: mergeNodesById(state.allNodes, nodes),
-      nodesLoaded: true,
-    })),
+  mergeNodes: (nodes) => {
+    scheduleLatLngForNodes(
+      [...nodes]
+        .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+        .slice(0, 50),
+    )
+    set((state) =>
+      patchVisible(state, {
+        allNodes: mergeNodesById(state.allNodes, nodes),
+        nodesLoaded: true,
+      }),
+    )
+  },
 
-  applyCountryNodeBatch: (countryCode, nodes, isFirstBatch, options) =>
-    set((state) => ({
-      allNodes: replaceCountryNodes(
+  applyCountryNodeBatch: (countryCode, nodes, isFirstBatch, options) => {
+    const topForGeo = [...nodes]
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+      .slice(0, 50)
+    scheduleLatLngForNodes(topForGeo)
+    set((state) => {
+      const allNodes = replaceCountryNodes(
         state.allNodes,
         countryCode,
         nodes,
         isFirstBatch,
         { sort: options?.sort === true },
-      ),
-    })),
+      )
+      if (options?.skipVisible) {
+        return {
+          allNodes,
+          nodesLoaded: true,
+          nodeCount: allNodes.length,
+        }
+      }
+      if (isFirstBatch || !state.nodesSyncing) {
+        return patchVisible(state, {
+          allNodes,
+          nodesLoaded: true,
+        })
+      }
+      const visibleIds = appendVisibleIdsForNodes(state, nodes)
+      return {
+        allNodes,
+        nodesLoaded: true,
+        visibleIds,
+        visibleCount: visibleIds.size,
+        nodeCount: allNodes.length,
+      }
+    })
+  },
 
   finalizeCountryNodesSort: () =>
-    set((state) => ({
-      allNodes: sortNodesByDate(state.allNodes),
-      nodesLoaded: true,
-    })),
+    set((state) =>
+      patchVisible(state, {
+        allNodes: sortNodesByDate(state.allNodes),
+        nodesLoaded: true,
+      }),
+    ),
 
   markCountryScopeLoaded: (scope) =>
     set((state) => {
@@ -222,34 +263,38 @@ export const useAppStore = create<AppStore>((set, get) => ({
       current && codes.includes(current)
         ? [current]
         : defaultSelectedCountry(codes)
-    set({
-      countryCategories: categories,
-      countryCategoriesLoaded: true,
-      countries: next,
-    })
+    set((state) =>
+      patchVisible(state, {
+        countryCategories: categories,
+        countryCategoriesLoaded: true,
+        countries: next,
+      }),
+    )
   },
 
-  setEra: (era) => set({ era }),
+  setEra: (era) => set((state) => patchVisible(state, { era })),
 
   toggleTheme: (theme) =>
     set((state) => {
-      if (theme === '全部主题') return { themes: [] }
+      if (theme === '全部主题') {
+        return patchVisible(state, { themes: [] })
+      }
       const exists = state.themes.includes(theme)
-      return {
+      return patchVisible(state, {
         themes: exists
           ? state.themes.filter((t) => t !== theme)
           : [...state.themes, theme],
-      }
+      })
     }),
 
-  /** 国家筛选为单选：ALL = 全部，否则仅选中一国 */
   toggleCountry: (code) =>
-    set(() => {
-      if (code === 'ALL') return { countries: [] }
-      return { countries: [code] }
+    set((state) => {
+      const countries = code === 'ALL' ? [] : [code]
+      return patchVisible(state, { countries })
     }),
 
-  setSearchQuery: (searchQuery) => set({ searchQuery }),
+  setSearchQuery: (searchQuery) =>
+    set((state) => patchVisible(state, { searchQuery })),
 
   setFocusedId: (focusedId) => set({ focusedId }),
 
@@ -265,21 +310,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   resetFilters: () => {
     const codes = get().countryCategories.map((c) => c.code)
-    set({
-      era: 'all',
-      themes: [],
-      countries: defaultSelectedCountry(codes),
-      searchQuery: '',
-      globeMarkerLimit: DEFAULT_GLOBE_MARKERS,
-    })
-  },
-
-  getVisibleSet: () => {
-    const { allNodes, era, themes, countries, searchQuery } = get()
-    return new Set(
-      allNodes
-        .filter((n) => matchesFilters(n, era, themes, countries, searchQuery))
-        .map((n) => n.id),
+    set((state) =>
+      patchVisible(state, {
+        era: 'all',
+        themes: [],
+        countries: defaultSelectedCountry(codes),
+        searchQuery: '',
+        globeMarkerLimit: DEFAULT_GLOBE_MARKERS,
+      }),
     )
   },
 }))

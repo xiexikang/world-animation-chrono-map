@@ -2,6 +2,7 @@ import { buildAnimeFetchFilters, countryScopeKey } from '@/lib/animeListFilters'
 import { loadAnimeWithCache } from '@/lib/loadAnimeWithCache'
 import { storeHasCountryScope } from '@/lib/mergeNodes'
 import type { ThemeDictionary } from '@/lib/themeDictionary'
+import { buildVisibleState } from '@/store/visibleState'
 import { useAppStore } from '@/store'
 
 export interface LoadCountryScopeOptions {
@@ -59,7 +60,10 @@ export async function loadCountryScope(
         if (signal?.aborted) return
         useAppStore
           .getState()
-          .applyCountryNodeBatch(countryCode, nodes, true, { sort: false })
+          .applyCountryNodeBatch(countryCode, nodes, true, {
+            sort: false,
+            skipVisible: silent,
+          })
         firstBatch = false
         if (willRefresh && !silent) {
           useAppStore.getState().setNodesSyncing(true)
@@ -76,6 +80,7 @@ export async function loadCountryScope(
           .getState()
           .applyCountryNodeBatch(countryCode, batch, firstBatch, {
             sort: false,
+            skipVisible: silent,
           })
         firstBatch = false
       },
@@ -84,6 +89,11 @@ export async function loadCountryScope(
     if (signal?.aborted) return false
 
     useAppStore.getState().finalizeCountryNodesSort()
+    if (silent) {
+      useAppStore.setState((state) => ({
+        ...buildVisibleState(state),
+      }))
+    }
     useAppStore.getState().markCountryScopeLoaded(scope)
     return true
   } catch (err) {

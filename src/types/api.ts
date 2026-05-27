@@ -24,9 +24,12 @@ export type AnimeSortBy =
 
 export type AnimeSortOrder = 'asc' | 'desc'
 
+export type AnimeListFields = 'full' | 'lite'
+
 export interface AnimeListParams {
   page?: number
   page_size?: number
+  fields?: AnimeListFields
   keyword?: string
   country_code?: string
   genre_id?: number
@@ -66,25 +69,29 @@ export interface CountryStatItem {
   total: number
 }
 
-/** 与后端 AnimeItem 字段一致 */
-export interface AnimeItem {
+/** 列表 lite 响应（无 overview / backdrop 等大字段） */
+export interface AnimeItemLite {
   tmdb_id: number
   country_code: string
-  adult: boolean
-  backdrop_path: string | null
   poster_path: string | null
   full_poster_path: string
-  original_language: string
   original_name: string
   name: string
-  overview: string | null
   popularity: number | string
   first_air_date: string | null
-  softcore: boolean
   vote_average: number | string
-  vote_count: number
   genre_ids: unknown[]
-  origin_country: unknown[]
   created_at: string
   updated_at: string
+}
+
+/** 与后端 AnimeItem 字段一致（详情 / fields=full） */
+export interface AnimeItem extends AnimeItemLite {
+  adult: boolean
+  backdrop_path: string | null
+  original_language: string
+  overview: string | null
+  softcore: boolean
+  vote_count: number
+  origin_country: unknown[]
 }

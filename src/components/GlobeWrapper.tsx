@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { MAX_GLOBE_MARKERS_CAP } from '@/constants/performance'
-import { buildNodeLatLngMap, resolveNodeLatLng } from '@/globe/countryRegions'
+import { resolveNodeLatLng } from '@/globe/countryRegions'
 import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
 import type { LatLng } from '@/globe/geo'
 import {
@@ -20,37 +20,39 @@ import {
 } from '@/globe/GlobeScene'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
-import { loadCoverTexture } from '@/lib/loadCoverTexture'
+import {
+  buildLatLngMapForNodes,
+  ensureLatLngForNodes,
+} from '@/lib/nodeLatLngCache'
+import { prioritizeCoverTextures } from '@/lib/loadCoverTexture'
 import {
   getSourceCountryGlobeCenter,
   sourceCountriesToGlobeRegions,
 } from '@/lib/sourceCountry'
 import { useAppStore } from '@/store'
-import type { AnimationNode } from '@/types'
 
-interface GlobeWrapperProps {
-  nodes: AnimationNode[]
-}
-
-export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
+export function GlobeWrapper() {
+  const allNodes = useAppStore((s) => s.allNodes)
+  const globeMarkerLimit = useAppStore((s) => s.globeMarkerLimit)
+  const latLngCacheVersion = useAppStore((s) => s.latLngCacheVersion)
   const visibleSet = useVisibleSet()
   const focusedId = useAppStore((s) => s.focusedId)
-  const globeMarkerLimit = useAppStore((s) => s.globeMarkerLimit)
   const selectedSourceCountries = useAppStore((s) => s.countries)
   const highlightCountries = useMemo(
     () => sourceCountriesToGlobeRegions(selectedSourceCountries),
     [selectedSourceCountries],
   )
-  const [latLngMap, setLatLngMap] = useState<Map<string, LatLng> | null>(null)
+  const [latLngMap, setLatLngMap] = useState<Map<string, LatLng>>(() => new Map())
   const [geoReady, setGeoReady] = useState(false)
+  const canvasEverMounted = useRef(false)
   const sceneRef = useRef<GlobeSceneHandle>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const defaultViewApplied = useRef(false)
   const initialCamera = getGlobeCameraPosition(CHINA_GLOBE_CENTER)
 
   const globeNodes = useMemo(
-    () => pickGlobeNodes(nodes, visibleSet, focusedId, globeMarkerLimit),
-    [nodes, visibleSet, focusedId, globeMarkerLimit],
+    () => pickGlobeNodes(allNodes, visibleSet, focusedId, globeMarkerLimit),
+    [allNodes, visibleSet, focusedId, globeMarkerLimit],
   )
 
   useEffect(() => {
@@ -59,32 +61,36 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
       setGeoReady(true)
       return
     }
+
+    const cached = buildLatLngMapForNodes(globeNodes)
+    if (cached.size > 0) {
+      setLatLngMap(cached)
+      setGeoReady(true)
+    }
+
+    const missing = globeNodes.filter((n) => !cached.has(n.id))
+    if (missing.length === 0) return
+
     let cancelled = false
-    setGeoReady(false)
-    void buildNodeLatLngMap(globeNodes)
-      .then((map) => {
-        if (!cancelled) {
-          setLatLngMap(map)
-          setGeoReady(true)
-        }
-      })
-      .catch((err) => {
-        console.error('布置地球标记失败:', err)
-        if (!cancelled) {
-          setLatLngMap(new Map())
-          setGeoReady(true)
-        }
-      })
+    void ensureLatLngForNodes(missing).then((map) => {
+      if (cancelled) return
+      setLatLngMap(buildLatLngMapForNodes(globeNodes))
+      setGeoReady(true)
+    })
+
     return () => {
       cancelled = true
     }
-  }, [globeNodes])
+  }, [globeNodes, latLngCacheVersion])
+
+  if (geoReady) canvasEverMounted.current = true
 
   useEffect(() => {
-    if (!focusedId) return
-    const node = globeNodes.find((n) => String(n.id) === focusedId)
-    if (node?.cover) void loadCoverTexture(node.cover)
-  }, [focusedId, globeNodes])
+    prioritizeCoverTextures(
+      globeNodes.map((n) => n.cover),
+      5,
+    )
+  }, [globeNodes])
 
   useEffect(() => {
     const focus = (id: string) => {
@@ -92,10 +98,7 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
       const store = useAppStore.getState()
       const node = store.allNodes.find((n) => String(n.id) === nodeId)
 
-      if (
-        node?.countryCode &&
-        store.countries[0] !== node.countryCode
-      ) {
+      if (node?.countryCode && store.countries[0] !== node.countryCode) {
         store.toggleCountry(node.countryCode)
       }
 
@@ -187,13 +190,15 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
     }
   }, [geoReady])
 
+  const showCanvas = canvasEverMounted.current || geoReady
+
   return (
     <div className="relative h-full w-full bg-[#010208]">
-      {!geoReady || !latLngMap ? (
+      {!showCanvas ? (
         <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-text-muted">
           <span>正在布置地球标记…</span>
           <span className="text-xs text-text-muted/70">
-            最多 {globeMarkerLimit} 个海报点
+            已缓存落点优先 · 最多 {globeMarkerLimit} 个标记
           </span>
         </div>
       ) : (
@@ -204,6 +209,7 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
             near: 0.1,
             far: 100,
           }}
+          dpr={Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.75)}
           gl={{
             antialias: true,
             alpha: true,
@@ -219,7 +225,6 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
               ref={sceneRef}
               nodes={globeNodes}
               latLngMap={latLngMap}
-              visibleSet={visibleSet}
               focusedId={focusedId}
               highlightCountries={highlightCountries}
             />
@@ -227,9 +232,9 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
         </Canvas>
       )}
       <p className="pointer-events-none fixed bottom-24 left-1/2 z-10 max-w-[min(90vw,28rem)] -translate-x-1/2 text-center text-xs text-text-muted/80 max-md:bottom-[11rem]">
-        拖拽旋转 · 地球展示热度最高的 {globeNodes.length} 部
-        {visibleSet.size > globeMarkerLimit
-          ? `（筛选 ${visibleSet.size} 部，右侧面板加载更多可增至 ${MAX_GLOBE_MARKERS_CAP}）`
+        拖拽旋转 · 地球 {globeNodes.length}/{globeMarkerLimit} 标记
+        {globeMarkerLimit < MAX_GLOBE_MARKERS_CAP && visibleSet.size > globeMarkerLimit
+          ? ` · 侧栏加载更多可增至 ${MAX_GLOBE_MARKERS_CAP}`
           : ''}
       </p>
     </div>

@@ -19,11 +19,11 @@ import {
   cancelCountryPrefetch,
   scheduleCountryPrefetch,
 } from '@/lib/prefetchCountryScopes'
+import { onLatLngCacheReady } from '@/lib/nodeLatLngCache'
 import { buildThemeDictionary } from '@/lib/themeDictionary'
 import { useAppStore } from '@/store'
 
 function App() {
-  const allNodes = useAppStore((s) => s.allNodes)
   const nodesLoaded = useAppStore((s) => s.nodesLoaded)
   const nodesSyncing = useAppStore((s) => s.nodesSyncing)
   const nodesLoadProgress = useAppStore((s) => s.nodesLoadProgress)
@@ -41,6 +41,12 @@ function App() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const isTablet = useMediaQuery('(min-width: 768px)')
   const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    return onLatLngCacheReady(() => {
+      useAppStore.getState().bumpLatLngCache()
+    })
+  }, [])
 
   useEffect(() => {
     if (countryCategoriesLoaded && themesLoaded) return
@@ -152,7 +158,7 @@ function App() {
   return (
     <div className="relative h-full w-full overflow-hidden bg-bg text-text">
       <div className="fixed inset-0 z-0">
-        <GlobeWrapper nodes={allNodes} />
+        <GlobeWrapper />
 
         {showBootOverlay ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-bg/55 px-6 text-center text-sm text-text-muted backdrop-blur-[2px]">

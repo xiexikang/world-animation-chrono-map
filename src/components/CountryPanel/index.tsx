@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { COUNTRY_LABELS } from '@/constants'
 import { LazyCoverImage } from '@/components/LazyCoverImage'
+import { VirtualList } from '@/components/VirtualList'
 import { PANEL_NODES_PAGE_SIZE } from '@/constants/performance'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { getCountryDisplayMeta } from '@/lib/countryMeta'
@@ -83,6 +84,14 @@ export function CountryPanel() {
     [countryNodes, listLimit],
   )
 
+  const gridRows = useMemo(() => {
+    const rows: AnimationNode[][] = []
+    for (let i = 0; i < displayNodes.length; i += 3) {
+      rows.push(displayNodes.slice(i, i + 3))
+    }
+    return rows
+  }, [displayNodes])
+
   const filteredCategories = useMemo(() => {
     return countryCategories.filter((item) => {
       if (!q) return true
@@ -157,40 +166,51 @@ export function CountryPanel() {
             theme={topTheme(countryNodes)}
           />
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+          <div className="flex min-h-0 flex-1 flex-col px-3 pb-3">
             {countryNodes.length === 0 ? (
               <p className="py-8 text-center text-sm text-text-muted">
                 暂无匹配作品
               </p>
             ) : (
-              <>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {displayNodes.map((node) => (
-                    <NodeGridItem
-                      key={node.id}
-                      node={node}
-                      active={String(detailCardId) === String(node.id)}
-                      onSelect={() => focusNode(node.id)}
-                    />
-                  ))}
-                </div>
-                {countryNodes.length > listLimit && (
-                  <button
-                    type="button"
-                    className="mt-3 w-full rounded-lg border border-white/10 py-2 text-xs text-text-muted transition hover:border-accent/40 hover:text-text"
-                    onClick={() => {
-                      const next = Math.min(
-                        listLimit + PANEL_NODES_PAGE_SIZE,
-                        countryNodes.length,
-                      )
-                      setListLimit(next)
-                      setGlobeMarkerLimit(next)
-                    }}
-                  >
-                    加载更多（已显示 {listLimit} / {countryNodes.length}，地球同步增加标记）
-                  </button>
+              <VirtualList
+                className="min-h-0 flex-1"
+                items={gridRows}
+                rowHeight={168}
+                renderRow={(row) => (
+                  <div className="grid grid-cols-3 gap-2.5 py-0.5">
+                    {row.map((node) => (
+                      <NodeGridItem
+                        key={node.id}
+                        node={node}
+                        active={String(detailCardId) === String(node.id)}
+                        onSelect={() => focusNode(node.id)}
+                      />
+                    ))}
+                  </div>
                 )}
-              </>
+                endSlot={
+                  countryNodes.length > listLimit ? (
+                    <button
+                      type="button"
+                      className="w-full rounded-lg border border-white/10 py-2 text-xs text-text-muted transition hover:border-accent/40 hover:text-text"
+                      onClick={() => {
+                        const next = Math.min(
+                          listLimit + PANEL_NODES_PAGE_SIZE,
+                          countryNodes.length,
+                        )
+                        setListLimit(next)
+                        setGlobeMarkerLimit(next)
+                      }}
+                    >
+                      加载更多（已显示 {listLimit} / {countryNodes.length}，地球同步增加标记）
+                    </button>
+                  ) : (
+                    <p className="py-2 text-center text-xs text-text-muted/70">
+                      已显示全部 {countryNodes.length} 部
+                    </p>
+                  )
+                }
+              />
             )}
           </div>
         </>

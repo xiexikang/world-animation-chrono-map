@@ -15,14 +15,18 @@ export interface GlobeSceneHandle {
 interface GlobeSceneProps {
   nodes: AnimationNode[]
   latLngMap: Map<string, LatLng>
-  visibleSet: Set<string>
   focusedId: string | null
   highlightCountries: CountryCode[]
 }
 
 export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
   function GlobeScene(
-    { nodes, latLngMap, visibleSet, focusedId, highlightCountries },
+    {
+      nodes,
+      latLngMap,
+      focusedId,
+      highlightCountries,
+    },
     ref,
   ) {
     const controlsRef = useRef<OrbitControlsImpl>(null)
@@ -69,16 +73,15 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
         <Earth />
         <CountryOutlines highlightCountries={highlightCountries} />
         {nodes.map((node) => {
-          const id = String(node.id)
-          const latLng = latLngMap.get(id)
+          const latLng = latLngMap.get(node.id)
           if (!latLng) return null
           return (
             <GlobeNodeMarker
-              key={id}
+              key={node.id}
               node={node}
               latLng={latLng}
-              visible={visibleSet.has(id)}
-              focused={focusedId === id}
+              visible
+              focused={node.id === focusedId}
             />
           )
         })}

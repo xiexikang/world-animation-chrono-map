@@ -174,6 +174,7 @@ export function CountryPanel() {
             ) : (
               <VirtualList
                 className="min-h-0 flex-1"
+                resetScrollKey={selected}
                 items={gridRows}
                 rowHeight={168}
                 renderRow={(row) => (

@@ -1,21 +1,10 @@
 import type { ThemeDictionary } from '@/lib/themeDictionary'
 import { mapGenreIdsToThemes } from '@/lib/themeDictionary'
+import { sourceCountryToGlobeRegion } from '@/lib/sourceCountry'
 import type { AnimeItem } from '@/types/api'
 import type { AnimationNode, CountryCode, EraCode } from '@/types'
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'
-
-const ORIGIN_TO_REGION: Record<string, CountryCode> = {
-  CN: 'CN',
-  JP: 'JP',
-  US: 'US',
-  FR: 'EU',
-  BE: 'EU',
-  FI: 'EU',
-  RU: 'EU',
-  GB: 'UK',
-  IE: 'UK',
-}
 
 function toNumberArray(values: unknown[]): number[] {
   return values
@@ -28,9 +17,10 @@ function toStringArray(values: unknown[]): string[] {
 }
 
 function mapRegion(origin: unknown[], countryCode?: string): CountryCode {
-  const raw = toStringArray(origin)[0] ?? countryCode?.toUpperCase()
+  if (countryCode) return sourceCountryToGlobeRegion(countryCode)
+  const raw = toStringArray(origin)[0]
   if (!raw) return 'OTHER'
-  return ORIGIN_TO_REGION[raw] ?? 'OTHER'
+  return sourceCountryToGlobeRegion(raw)
 }
 
 function eraFromYear(year: number): EraCode {

@@ -192,21 +192,6 @@ function GlassAtmosphere() {
   )
 }
 
-function FallbackEarthSurface() {
-  return (
-    <mesh renderOrder={1}>
-      <sphereGeometry args={[0.986, 48, 48]} />
-      <meshStandardMaterial
-        color="#1a3a6e"
-        emissive="#2a5aa8"
-        emissiveIntensity={0.8}
-        roughness={0.9}
-        metalness={0.05}
-      />
-    </mesh>
-  )
-}
-
 function EarthWithTexture() {
   const [colorMap] = useTexture([EARTH_MAP])
 
@@ -223,7 +208,7 @@ function EarthWithTexture() {
 
 export function Earth() {
   return (
-    <Suspense fallback={<FallbackEarthSurface />}>
+    <Suspense fallback={null}>
       <EarthWithTexture />
     </Suspense>
   )

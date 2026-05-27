@@ -1,10 +1,17 @@
 import { Environment, OrbitControls } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import type { PerspectiveCamera } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { forwardRef, useImperativeHandle, useRef } from 'react'
 import type { AnimationNode, CountryCode } from '@/types'
 import type { LatLng } from './geo'
 import { CountryOutlines } from './CountryOutlines'
 import { Earth } from './Earth'
+import {
+  clampGlobeCameraDistance,
+  DEFAULT_ORBIT_LIMITS,
+  type GlobeOrbitLimits,
+} from './focusCamera'
 import { GlobeNodeMarker } from './GlobeNodeMarker'
 import { Starfield } from './Starfield'
 
@@ -17,6 +24,7 @@ interface GlobeSceneProps {
   latLngMap: Map<string, LatLng>
   focusedId: string | null
   highlightCountries: CountryCode[]
+  orbitLimits?: GlobeOrbitLimits
 }
 
 export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
@@ -26,10 +34,12 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
       latLngMap,
       focusedId,
       highlightCountries,
+      orbitLimits = DEFAULT_ORBIT_LIMITS,
     },
     ref,
   ) {
     const controlsRef = useRef<OrbitControlsImpl>(null)
+    const { camera, scene } = useThree()
 
     useImperativeHandle(ref, () => ({
       get controls() {
@@ -37,10 +47,25 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
       },
     }))
 
+    useEffect(() => {
+      scene.background = null
+    }, [scene])
+
+    useEffect(() => {
+      const controls = controlsRef.current
+      if (!controls) return
+      controls.minDistance = orbitLimits.minDistance
+      controls.maxDistance = orbitLimits.maxDistance
+      clampGlobeCameraDistance(
+        camera as PerspectiveCamera,
+        controls,
+        orbitLimits.minDistance,
+        orbitLimits.maxDistance,
+      )
+    }, [camera, orbitLimits])
+
     return (
       <>
-        <color attach="background" args={['#010208']} />
-        <fog attach="fog" args={['#010208', 32, 100]} />
         <Starfield />
         <Environment preset="night" background={false} />
 
@@ -88,10 +113,10 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
         <OrbitControls
           ref={controlsRef}
           enablePan={false}
-          minDistance={1.55}
-          maxDistance={3.2}
+          minDistance={orbitLimits.minDistance}
+          maxDistance={orbitLimits.maxDistance}
           rotateSpeed={0.5}
-          zoomSpeed={0.7}
+          zoomSpeed={0.85}
           dampingFactor={0.06}
           enableDamping
         />

@@ -1,14 +1,12 @@
 import { Line } from '@react-three/drei'
 import { useEffect, useState } from 'react'
+import { COUNTRY_NODE_COLORS, GLOBE_COUNTRY_CODES } from '@/constants'
 import type { CountryCode } from '@/types'
-import { COUNTRY_NODE_COLORS } from '@/constants'
 import { GLOBE_RADIUS } from './geo'
 import { latLngToVector3 } from './geo'
 import { getCountryOutlineRings } from './countryRegions'
 
 const OUTLINE_RADIUS = GLOBE_RADIUS + 0.004
-const COUNTRY_CODES: CountryCode[] = ['CN', 'JP', 'US', 'EU', 'UK', 'OTHER']
-
 function ringToPoints(ring: number[][]): [number, number, number][] {
   const pts: [number, number, number][] = []
   for (const [lng, lat] of ring) {
@@ -44,7 +42,7 @@ export function CountryOutlines({
 
   return (
     <group>
-      {COUNTRY_CODES.map((code) => {
+      {GLOBE_COUNTRY_CODES.map((code) => {
         const countryRings = rings.get(code)
         if (!countryRings?.length) return null
         const highlighted =

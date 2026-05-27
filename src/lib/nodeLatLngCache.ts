@@ -2,6 +2,9 @@ import { buildNodeLatLngMap } from '@/globe/countryRegions'
 import type { LatLng } from '@/globe/geo'
 import type { AnimationNode } from '@/types'
 
+/** 落点算法版本变更时递增，避免沿用过期的拥挤布局 */
+const LAT_LNG_PLACEMENT_VERSION = 2
+
 const latLngCache = new Map<string, LatLng>()
 
 const FLUSH_MS = 200
@@ -13,16 +16,20 @@ let flushTimer: ReturnType<typeof setTimeout> | null = null
 let inflight: Promise<void> | null = null
 
 export function getCachedLatLng(nodeId: string): LatLng | undefined {
-  return latLngCache.get(nodeId)
+  return latLngCache.get(cacheKey(nodeId))
 }
 
 export function getLatLngCacheSnapshot(): Map<string, LatLng> {
   return new Map(latLngCache)
 }
 
+function cacheKey(nodeId: string): string {
+  return `${LAT_LNG_PLACEMENT_VERSION}:${nodeId}`
+}
+
 export function mergeLatLngIntoCache(entries: Map<string, LatLng>): void {
   for (const [id, latLng] of entries) {
-    latLngCache.set(id, latLng)
+    latLngCache.set(cacheKey(id), latLng)
   }
 }
 
@@ -30,7 +37,7 @@ export function mergeLatLngIntoCache(entries: Map<string, LatLng>): void {
 export async function ensureLatLngForNodes(
   nodes: AnimationNode[],
 ): Promise<Map<string, LatLng>> {
-  const missing = nodes.filter((n) => !latLngCache.has(n.id))
+  const missing = nodes.filter((n) => !latLngCache.has(cacheKey(n.id)))
   if (missing.length === 0) {
     return getLatLngCacheSnapshot()
   }
@@ -44,7 +51,7 @@ export function buildLatLngMapForNodes(
 ): Map<string, LatLng> {
   const map = new Map<string, LatLng>()
   for (const node of nodes) {
-    const cached = latLngCache.get(node.id)
+    const cached = latLngCache.get(cacheKey(node.id))
     if (cached) map.set(node.id, cached)
   }
   return map
@@ -77,7 +84,7 @@ async function runLatLngFlush(nodes: AnimationNode[]): Promise<void> {
 
   if (inflight) {
     await inflight
-    const stillMissing = nodes.filter((n) => !latLngCache.has(n.id))
+    const stillMissing = nodes.filter((n) => !latLngCache.has(cacheKey(n.id)))
     if (stillMissing.length === 0) return
     return runLatLngFlush(stillMissing)
   }
@@ -121,7 +128,7 @@ export function scheduleLatLngForNodes(nodes: AnimationNode[]): void {
   if (nodes.length === 0) return
 
   for (const node of nodes) {
-    if (latLngCache.has(node.id) || pendingIds.has(node.id)) continue
+    if (latLngCache.has(cacheKey(node.id)) || pendingIds.has(node.id)) continue
     pendingIds.add(node.id)
     pendingNodes.push(node)
   }

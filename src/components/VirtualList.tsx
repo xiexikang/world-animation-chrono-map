@@ -8,6 +8,8 @@ interface VirtualListProps<T> {
   renderRow: (item: T, index: number) => React.ReactNode
   /** 渲染在列表滚动区域末尾（如「加载更多」） */
   endSlot?: React.ReactNode
+  /** 变化时将列表滚回顶部（如切换国家） */
+  resetScrollKey?: string | number | null
 }
 
 export function VirtualList<T>({
@@ -17,10 +19,18 @@ export function VirtualList<T>({
   overscan = 4,
   renderRow,
   endSlot,
+  resetScrollKey,
 }: VirtualListProps<T>) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(480)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollTop = 0
+    setScrollTop(0)
+  }, [resetScrollKey])
 
   useEffect(() => {
     const el = scrollRef.current

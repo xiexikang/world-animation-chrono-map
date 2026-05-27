@@ -13,8 +13,49 @@ const _cameraPos = new THREE.Vector3()
 export const CHINA_GLOBE_CENTER: LatLng = { lat: 35, lng: 103 }
 /** 「全部国家」时拉远，便于浏览全球 */
 export const WORLD_GLOBE_CENTER: LatLng = { lat: 20, lng: 10 }
-export const DEFAULT_GLOBE_DISTANCE = 2.05
-export const WORLD_GLOBE_DISTANCE = 2.35
+/** 默认/大国初始与切换视距（越大地球在屏幕上越小） */
+export const DEFAULT_GLOBE_DISTANCE = 2.62
+export const WORLD_GLOBE_DISTANCE = 2.85
+
+/** 相机距地心距离与滚轮缩放上下限（须大于地球半径 1） */
+export interface GlobeOrbitLimits {
+  focusDistance: number
+  minDistance: number
+  maxDistance: number
+}
+
+export const DEFAULT_ORBIT_LIMITS: GlobeOrbitLimits = {
+  focusDistance: DEFAULT_GLOBE_DISTANCE,
+  minDistance: 1.55,
+  maxDistance: 3.2,
+}
+
+export const WORLD_ORBIT_LIMITS: GlobeOrbitLimits = {
+  focusDistance: WORLD_GLOBE_DISTANCE,
+  minDistance: 1.55,
+  maxDistance: 3.2,
+}
+
+const _offset = new THREE.Vector3()
+
+/** 切换国家后把当前视距收进新的缩放范围 */
+export function clampGlobeCameraDistance(
+  camera: PerspectiveCamera,
+  controls: OrbitControlsImpl,
+  minDistance: number,
+  maxDistance: number,
+): void {
+  _offset.copy(camera.position).sub(controls.target)
+  const dist = _offset.length()
+  if (dist < minDistance) {
+    _offset.normalize().multiplyScalar(minDistance)
+    camera.position.copy(controls.target).add(_offset)
+  } else if (dist > maxDistance) {
+    _offset.normalize().multiplyScalar(maxDistance)
+    camera.position.copy(controls.target).add(_offset)
+  }
+  controls.update()
+}
 
 export function getGlobeCameraPosition(
   latLng: LatLng,
@@ -68,7 +109,7 @@ export function focusGlobeOnLatLng(
   camera: PerspectiveCamera,
   controls: OrbitControlsImpl,
   latLng: LatLng,
-  distance = 2.05,
+  distance = DEFAULT_GLOBE_DISTANCE,
 ): void {
   const [x, y, z] = getGlobeCameraPosition(latLng, distance)
 

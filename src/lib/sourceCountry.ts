@@ -1,52 +1,66 @@
 import type { LatLng } from '@/globe/geo'
-import { CHINA_GLOBE_CENTER } from '@/globe/focusCamera'
-import { getCountryGlobeCenter } from '@/globe/countryRegions'
-import type { CountryCode } from '@/types'
+import {
+  DEFAULT_ORBIT_LIMITS,
+  type GlobeOrbitLimits,
+} from '@/globe/focusCamera'
+import {
+  getCountryGlobeCenter,
+  getGlobeOrbitLimitsForRegion,
+} from '@/globe/countryRegions'
+import {
+  isSourceCountryCode,
+  SOURCE_COUNTRY_CODES,
+  type CountryCode,
+  type SourceCountryCode,
+} from '@/types'
 
-/** 数据源国家码 → 地球版图区域（用于节点落点与轮廓高亮） */
-const SOURCE_TO_GLOBE_REGION: Record<string, CountryCode> = {
-  CN: 'CN',
-  JP: 'JP',
-  US: 'US',
-  GB: 'UK',
-  IE: 'UK',
-  FR: 'EU',
-  BE: 'EU',
-  FI: 'EU',
-  CZ: 'EU',
-  RU: 'EU',
-  KR: 'OTHER',
-}
+export { SOURCE_COUNTRY_CODES, type SourceCountryCode }
 
-/** 无对应版图区域时的相机对准点 */
-const SOURCE_GLOBE_CENTERS: Record<string, LatLng> = {
-  CN: CHINA_GLOBE_CENTER,
-  JP: { lat: 36, lng: 138 },
-  US: { lat: 39, lng: -98 },
-  GB: { lat: 54, lng: -2 },
-  IE: { lat: 53.5, lng: -8 },
-  FR: { lat: 46.5, lng: 2.5 },
-  BE: { lat: 50.5, lng: 4.5 },
-  CZ: { lat: 49.8, lng: 15.5 },
-  FI: { lat: 64, lng: 26 },
-  KR: { lat: 36.5, lng: 127.5 },
-}
-
+/** 在 10 国列表内则原样返回 ISO，否则 OTHER（非数据源 TMDB 出品国） */
 export function sourceCountryToGlobeRegion(code: string): CountryCode {
-  return SOURCE_TO_GLOBE_REGION[code.toUpperCase()] ?? 'OTHER'
+  const upper = code.toUpperCase()
+  return isSourceCountryCode(upper) ? (upper as SourceCountryCode) : 'OTHER'
 }
 
 export function sourceCountriesToGlobeRegions(codes: string[]): CountryCode[] {
   return [...new Set(codes.map(sourceCountryToGlobeRegion))]
 }
 
+const COMPACT_SOURCE_ORBIT: Partial<
+  Record<SourceCountryCode, GlobeOrbitLimits>
+> = {
+  JP: { focusDistance: 1.58, minDistance: 1.42, maxDistance: 2.35 },
+  KR: { focusDistance: 1.58, minDistance: 1.42, maxDistance: 2.35 },
+  GB: { focusDistance: 1.65, minDistance: 1.44, maxDistance: 2.4 },
+  IE: { focusDistance: 1.65, minDistance: 1.44, maxDistance: 2.4 },
+  BE: { focusDistance: 1.62, minDistance: 1.43, maxDistance: 2.38 },
+  CZ: { focusDistance: 1.62, minDistance: 1.43, maxDistance: 2.38 },
+  FI: { focusDistance: 1.68, minDistance: 1.45, maxDistance: 2.42 },
+  CN: { focusDistance: 1.72, minDistance: 1.48, maxDistance: 2.5 },
+  FR: { focusDistance: 1.7, minDistance: 1.47, maxDistance: 2.48 },
+}
+
 export async function getSourceCountryGlobeCenter(code: string): Promise<LatLng> {
-  const upper = code.toUpperCase()
-  const region = sourceCountryToGlobeRegion(upper)
+  const region = sourceCountryToGlobeRegion(code)
   if (region !== 'OTHER') {
     return getCountryGlobeCenter(region)
   }
-  return SOURCE_GLOBE_CENTERS[upper] ?? { lat: 20, lng: 0 }
+  return { lat: 20, lng: 0 }
+}
+
+export async function getSourceCountryGlobeView(code: string): Promise<{
+  center: LatLng
+  orbit: GlobeOrbitLimits
+}> {
+  const upper = code.toUpperCase()
+  const center = await getSourceCountryGlobeCenter(upper)
+  if (isSourceCountryCode(upper)) {
+    const compact = COMPACT_SOURCE_ORBIT[upper]
+    if (compact) return { center, orbit: compact }
+    const orbit = await getGlobeOrbitLimitsForRegion(upper)
+    return { center, orbit }
+  }
+  return { center, orbit: DEFAULT_ORBIT_LIMITS }
 }
 
 export function nodeMatchesSourceCountry(

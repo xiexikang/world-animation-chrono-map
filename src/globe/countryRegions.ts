@@ -7,50 +7,32 @@ import type { Topology } from 'topojson-specification'
 import countries110m from 'world-atlas/countries-110m.json'
 import type { AnimationNode, CountryCode } from '@/types'
 import type { LatLng } from './geo'
+import {
+  DEFAULT_ORBIT_LIMITS,
+  type GlobeOrbitLimits,
+} from './focusCamera'
 import { sortNodesByDate } from '@/lib/sortNodes'
 
-/** Natural Earth 国家名 → 项目地域代码 */
-const COUNTRY_NAME_TO_CODE: Record<string, CountryCode> = {
+/** Natural Earth 国家名 → 数据源 ISO（与 /api/countries 一致） */
+const NATURAL_EARTH_TO_CODE: Record<string, CountryCode> = {
   China: 'CN',
   Japan: 'JP',
   'United States of America': 'US',
-  'United Kingdom': 'UK',
+  'United Kingdom': 'GB',
+  Ireland: 'IE',
+  France: 'FR',
+  Belgium: 'BE',
+  Finland: 'FI',
+  Czechia: 'CZ',
+  'South Korea': 'KR',
 }
 
-/** 欧洲节点落在这些国家的版图内（随机选取） */
-const EU_TERRITORY_NAMES = [
-  'France',
-  'Germany',
-  'Italy',
-  'Spain',
-  'Netherlands',
-  'Belgium',
-  'Switzerland',
-  'Austria',
-  'Poland',
-  'Czechia',
-  'Denmark',
-  'Finland',
-  'Norway',
-  'Sweden',
-  'Portugal',
-  'Ireland',
-  'Greece',
-  'Hungary',
-  'Romania',
-  'Slovakia',
-  'Croatia',
-  'Bulgaria',
-  'Serbia',
-  'Ukraine',
-]
-
+/** 非 10 国数据源时的节点落点（TMDB 其它出品国） */
 const OTHER_TERRITORY_NAMES = [
   'Canada',
   'Australia',
   'Brazil',
   'Mexico',
-  'South Korea',
   'India',
   'Thailand',
   'Indonesia',
@@ -123,13 +105,9 @@ export async function loadCountryRegions(): Promise<
     const polys = asPolygonFeatures(f.geometry as Geometry)
     if (polys.length === 0) continue
 
-    const code = COUNTRY_NAME_TO_CODE[name]
+    const code = NATURAL_EARTH_TO_CODE[name]
     if (code) {
       polys.forEach((p) => push(code, p))
-      continue
-    }
-    if (EU_TERRITORY_NAMES.includes(name)) {
-      polys.forEach((p) => push('EU', p))
       continue
     }
     if (OTHER_TERRITORY_NAMES.includes(name)) {
@@ -205,9 +183,102 @@ function haversineKm(a: LatLng, b: LatLng): number {
   return 2 * R * Math.asin(Math.sqrt(h))
 }
 
+function regionDiagKm(polys: GeoPoly[]): number {
+  const [minLng, minLat, maxLng, maxLat] = combinedBbox(polys)
+  return haversineKm(
+    { lat: minLat, lng: minLng },
+    { lat: maxLat, lng: maxLng },
+  )
+}
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t
+}
+
+/**
+ * 按版图外接框对角线（公里）插值相机参数。
+ * distance = 相机到地心的距离（地球半径为 1，原默认 focus ≈ 2.05）。
+ * 仅对中小版图略拉近；大国（对角线 > 3800km）保持 DEFAULT，避免中国/美国过近。
+ */
+export function orbitLimitsFromRegionDiagKm(diagKm: number): GlobeOrbitLimits {
+  const t = Math.min(Math.max((diagKm - 700) / 5100, 0), 1)
+  return {
+    focusDistance: lerp(1.72, 2.62, t),
+    minDistance: lerp(1.48, 1.55, t),
+    maxDistance: lerp(2.4, 3.2, t),
+  }
+}
+
+/** 版图外接框对角线超过此值视为大国，用默认全球式视距 */
+const LARGE_REGION_DIAG_KM = 3800
+
+export async function getGlobeOrbitLimitsForRegion(
+  code: CountryCode,
+): Promise<GlobeOrbitLimits> {
+  const regions = await loadCountryRegions()
+  const polys = regions.get(code)
+  if (!polys?.length) return DEFAULT_ORBIT_LIMITS
+  const diagKm = regionDiagKm(polys)
+  if (diagKm >= LARGE_REGION_DIAG_KM) return DEFAULT_ORBIT_LIMITS
+  return orbitLimitsFromRegionDiagKm(diagKm)
+}
+
 function minDistanceTo(latLng: LatLng, others: LatLng[]): number {
   if (others.length === 0) return Infinity
   return Math.min(...others.map((o) => haversineKm(latLng, o)))
+}
+
+/** 海报在地球表面可读的最小间距（公里） */
+const POSTER_MIN_SEP_KM = 140
+
+function regionCenter(polys: GeoPoly[]): LatLng {
+  const [minLng, minLat, maxLng, maxLat] = combinedBbox(polys)
+  return { lat: (minLat + maxLat) / 2, lng: (minLng + maxLng) / 2 }
+}
+
+/** 按版图外接矩形估算「版图内」可舒适放置的海报数量 */
+function estimateInCountryCapacity(polys: GeoPoly[], minSepKm: number): number {
+  const [minLng, minLat, maxLng, maxLat] = combinedBbox(polys)
+  const midLat = (minLat + maxLat) / 2
+  const latKm = Math.max(maxLat - minLat, 0.5) * 111.32
+  const lngKm =
+    Math.max(maxLng - minLng, 0.5) *
+    111.32 *
+    Math.cos((midLat * Math.PI) / 180)
+  const effectiveAreaKm2 = latKm * lngKm * 0.52
+  const cellArea = minSepKm * minSepKm * 1.15
+  return Math.max(4, Math.floor(effectiveAreaKm2 / cellArea))
+}
+
+/** 超出版图容量的作品：绕国家中心螺旋排布（多在近海，避免挤在岛内） */
+function placeOverflowHalo(
+  nodes: AnimationNode[],
+  center: LatLng,
+  seed: string,
+): Map<string, LatLng> {
+  const result = new Map<string, LatLng>()
+  if (nodes.length === 0) return result
+
+  const rng = seededRng(`${seed}:halo`)
+  const latScale = 0.9
+  const lngScale = 1 / Math.max(0.35, Math.cos((center.lat * Math.PI) / 180))
+  const baseRadius = 2.6
+  const ringStep = 2.0
+  const perRing = 14
+
+  for (let i = 0; i < nodes.length; i++) {
+    const ring = Math.floor(i / perRing)
+    const idxInRing = i % perRing
+    const angle =
+      idxInRing * ((Math.PI * 2) / perRing) + ring * 0.45 + (rng() - 0.5) * 0.12
+    const radius = baseRadius + ring * ringStep + (rng() - 0.5) * 0.2
+    result.set(nodes[i]!.id, {
+      lat: center.lat + radius * latScale * Math.cos(angle),
+      lng: center.lng + radius * lngScale * Math.sin(angle),
+    })
+  }
+
+  return result
 }
 
 /** 在版图内生成网格候选点，尽量覆盖空白区域 */
@@ -265,16 +336,15 @@ function buildCandidatePool(
   return candidates
 }
 
-/** 最远点采样：在候选点里逐次选离已选点最远的位置 */
-function spreadNodesInCountry(
+/** 版图内最远点采样 */
+function spreadInsideCountry(
   nodes: AnimationNode[],
   polys: GeoPoly[],
+  seed: string,
 ): Map<string, LatLng> {
-  const sorted = sortNodesByDate(nodes)
-  const n = sorted.length
+  const n = nodes.length
   if (n === 0) return new Map()
 
-  const seed = `${sorted[0]?.country ?? 'X'}-${n}-${sorted[0]?.id ?? ''}-${sorted[n - 1]?.id ?? ''}`
   let pool = buildCandidatePool(polys, n, seed)
   const rng = seededRng(`${seed}:fps`)
   const [minLng, minLat, maxLng, maxLat] = combinedBbox(polys)
@@ -282,7 +352,10 @@ function spreadNodesInCountry(
     { lat: minLat, lng: minLng },
     { lat: maxLat, lng: maxLng },
   )
-  const minSepKm = Math.max(80, (diagKm / Math.sqrt(n * 1.15)) * 0.42)
+  const minSepKm = Math.max(
+    POSTER_MIN_SEP_KM,
+    (diagKm / Math.sqrt(n * 1.15)) * 0.42,
+  )
 
   const selected: LatLng[] = []
   const result = new Map<string, LatLng>()
@@ -321,9 +394,39 @@ function spreadNodesInCountry(
     if (!picked) continue
 
     selected.push(picked)
-    result.set(sorted[i]!.id, picked)
-
+    result.set(nodes[i]!.id, picked)
     pool = pool.filter((c) => haversineKm(c, picked!) >= minSepKm * 0.35)
+  }
+
+  return result
+}
+
+/**
+ * 小国高密度：优先在真实版图内均匀落点；超出容量的作品绕中心螺旋排布，避免岛内堆叠。
+ */
+function spreadNodesInCountry(
+  nodes: AnimationNode[],
+  polys: GeoPoly[],
+): Map<string, LatLng> {
+  const sorted = sortNodesByDate(nodes)
+  const n = sorted.length
+  if (n === 0) return new Map()
+
+  const seed = `${sorted[0]?.country ?? 'X'}-${n}-${sorted[0]?.id ?? ''}-${sorted[n - 1]?.id ?? ''}`
+  const inCountryCap = estimateInCountryCapacity(polys, POSTER_MIN_SEP_KM)
+  const inCountryNodes = sorted.slice(0, Math.min(n, inCountryCap))
+  const overflowNodes = sorted.slice(inCountryCap)
+
+  const result = spreadInsideCountry(inCountryNodes, polys, seed)
+  if (overflowNodes.length > 0) {
+    const halo = placeOverflowHalo(
+      overflowNodes,
+      regionCenter(polys),
+      seed,
+    )
+    for (const [id, latLng] of halo) {
+      result.set(id, latLng)
+    }
   }
 
   return result
@@ -393,17 +496,6 @@ export async function resolveNodeLatLng(
   return null
 }
 
-/** 国界轮廓（每国取外环，欧洲仅绘主要国家以保持性能） */
-const EU_OUTLINE_NAMES = new Set([
-  'France',
-  'Germany',
-  'Italy',
-  'Spain',
-  'Netherlands',
-  'Poland',
-  'Sweden',
-])
-
 let outlineCache: Map<CountryCode, number[][][]> | null = null
 
 export async function getCountryOutlineRings(): Promise<
@@ -429,8 +521,7 @@ export async function getCountryOutlineRings(): Promise<
     const name = f.properties?.name as string | undefined
     if (!name) continue
 
-    let code: CountryCode | null = COUNTRY_NAME_TO_CODE[name] ?? null
-    if (!code && EU_OUTLINE_NAMES.has(name)) code = 'EU'
+    const code = NATURAL_EARTH_TO_CODE[name]
     if (!code) continue
 
     const geom = f.geometry as Geometry

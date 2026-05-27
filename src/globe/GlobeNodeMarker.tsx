@@ -1,10 +1,11 @@
 import { Billboard } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import type { AnimationNode } from '@/types'
 import { canvasEmitter } from '@/lib/emitter'
 import { loadCoverTexture } from '@/lib/loadCoverTexture'
+import { DEFAULT_GLOBE_DISTANCE } from './focusCamera'
 import type { LatLng } from './geo'
 import { latLngToNodePosition } from './geo'
 
@@ -14,6 +15,15 @@ const OPACITY_FOCUSED = 1
 const OPACITY_DIM = 0.18
 const COVER_W = 0.018
 const COVER_H = 0.025
+
+/** 按当前相机视距缩放，避免小国拉近后海报在屏幕上显得过大 */
+function posterSizeFactor(cameraDistance: number): number {
+  return THREE.MathUtils.clamp(
+    cameraDistance / DEFAULT_GLOBE_DISTANCE,
+    0.58,
+    1.12,
+  )
+}
 
 interface GlobeNodeMarkerProps {
   node: AnimationNode
@@ -32,6 +42,7 @@ export function GlobeNodeMarker({
 }: GlobeNodeMarkerProps) {
   const groupRef = useRef<THREE.Group>(null)
   const matRef = useRef<THREE.MeshBasicMaterial>(null)
+  const { camera } = useThree()
   const [x, y, z] = latLngToNodePosition(latLng.lat, latLng.lng)
 
   useEffect(() => {
@@ -82,7 +93,9 @@ export function GlobeNodeMarker({
     // 无贴图时不渲染，避免加载前出现黑块
     g.visible = hasMap
 
-    const targetScale = focused ? 1.3 : visible ? 1 : 0.75
+    const distFactor = posterSizeFactor(camera.position.length())
+    const targetScale =
+      distFactor * (focused ? 1.3 : visible ? 1 : 0.75)
     const targetOpacity = !hasMap
       ? 0
       : focused

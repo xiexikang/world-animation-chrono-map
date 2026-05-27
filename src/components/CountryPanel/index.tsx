@@ -127,7 +127,7 @@ export function CountryPanel() {
       <PanelSearch query={query} setQuery={setQuery} />
 
       <nav
-        className="flex gap-1.5 overflow-x-auto border-b border-white/10 px-3 py-2.5"
+        className="panel-scrollbar-x flex gap-1.5 overflow-x-auto border-b border-white/10 px-3 py-2.5 pb-3"
         role="radiogroup"
         aria-label="国家单选"
       >
@@ -403,7 +403,7 @@ function CountryBrowse({
   onSelect: (code: string) => void
 }) {
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+    <div className="panel-scrollbar min-h-0 flex-1 overflow-y-auto px-3 py-3 pr-2">
       <div className="mb-3 grid grid-cols-2 gap-2">
         <StatBox label="全球作品" value={`${total}`} />
         <StatBox label="国家/地区" value={`${allCategories.length}`} />

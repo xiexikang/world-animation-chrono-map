@@ -44,7 +44,7 @@ export function Sidebar() {
           ‹
         </button>
       </div>
-      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3">
+      <nav className="panel-scrollbar flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3 pr-1">
         <button
           type="button"
           onClick={() => toggleTheme('全部主题')}

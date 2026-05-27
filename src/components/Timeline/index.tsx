@@ -8,7 +8,7 @@ export function Timeline() {
   return (
     <footer className="float-panel fixed right-3 bottom-3 left-3 z-30 px-4 py-2.5 md:left-1/2 md:w-auto md:max-w-3xl md:-translate-x-1/2">
       <nav
-        className="flex items-center justify-center gap-2 overflow-x-auto"
+        className="panel-scrollbar-x flex items-center justify-center gap-2 overflow-x-auto pb-1"
         aria-label="年代筛选"
         role="radiogroup"
       >

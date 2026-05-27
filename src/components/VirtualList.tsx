@@ -49,7 +49,7 @@ export function VirtualList<T>({
   return (
     <div
       ref={scrollRef}
-      className={`overflow-y-auto ${className}`}
+      className={`panel-scrollbar overflow-y-auto pr-0.5 ${className}`}
       onScroll={onScroll}
     >
       <div style={{ height: totalHeight, position: 'relative' }}>

@@ -20,7 +20,7 @@ export function ThemeDrawer() {
         onClick={() => setMobileThemeOpen(false)}
       />
       <aside
-        className="glass-panel fixed right-0 bottom-0 left-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl p-4 md:hidden"
+        className="glass-panel panel-scrollbar fixed right-0 bottom-0 left-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl p-4 pr-3 md:hidden"
         role="dialog"
         aria-labelledby="theme-drawer-title"
       >

@@ -55,3 +55,92 @@
   border-radius: 0.75rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
+
+/* 面板内滚动条：细轨、圆角、悬停 accent */
+@utility panel-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 1, 0.5) rgba(255, 255, 255, 0.06);
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    margin: 6px 0;
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.15);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 107, 1, 0.75) 0%,
+      rgba(255, 107, 1, 0.45) 100%
+    );
+    border-color: rgba(255, 107, 1, 0.35);
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 107, 1, 0.85);
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@utility panel-scrollbar-x {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 1, 0.5) rgba(255, 255, 255, 0.06);
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    margin: 0 6px;
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.15);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 107, 1, 0.75) 0%,
+      rgba(255, 107, 1, 0.45) 100%
+    );
+    border-color: rgba(255, 107, 1, 0.35);
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 107, 1, 0.85);
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

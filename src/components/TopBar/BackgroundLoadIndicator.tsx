@@ -13,7 +13,7 @@ export function BackgroundLoadIndicator() {
 
   return (
     <div
-      className="pointer-events-none fixed top-[3.65rem] right-3 left-3 z-[35] md:right-4 md:left-4"
+      className="pointer-events-none fixed top-[4.5rem] right-3 left-3 z-[35] md:right-4 md:left-4"
       role="status"
       aria-live="polite"
       aria-label={

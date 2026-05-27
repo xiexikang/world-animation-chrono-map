@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import logoUrl from '@/assets/logo.png'
 import { MAX_GLOBE_MARKERS_CAP } from '@/constants/performance'
 import { useVisibleCount } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
@@ -26,11 +27,17 @@ export function TopBar() {
 
   return (
     <>
-    <header className="float-panel fixed top-3 right-3 left-3 z-30 flex h-11 items-center gap-4 px-4 md:left-4 md:right-4">
-      <div className="flex shrink-0 items-center gap-2 text-base font-bold text-accent">
-        <span aria-hidden>🎬</span>
-        <span className="max-md:hidden">世界动画地图</span>
-        <span className="md:hidden">动画地图</span>
+    <header className="float-panel fixed top-3 right-3 left-3 z-30 flex h-14 items-center gap-4 px-4 md:left-4 md:right-4">
+      <div className="flex shrink-0 items-center">
+        <img
+          src={logoUrl}
+          alt="世界动画时空地图"
+          className="h-12 w-auto max-w-[min(54vw,15rem)] object-contain object-left sm:max-w-[18rem] md:h-14 md:max-w-[22rem]"
+          width={1024}
+          height={559}
+          draggable={false}
+          decoding="async"
+        />
       </div>
 
       <div className="flex flex-1 justify-center">

@@ -7,11 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "covers:download": "node scripts/download-covers.mjs",
-    "covers:cn10": "node scripts/download-covers.mjs \"%USERPROFILE%\\Downloads\\animations_100_with_covers.json\" --cn10",
-    "covers:sync": "node scripts/sync-local-covers.mjs",
-    "data:normalize": "node scripts/normalize-nodes.mjs"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

@@ -11,10 +11,6 @@ const waitQueue: Array<() => void> = []
 const TEX_W = 88
 const TEX_H = 124
 
-function delay(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms))
-}
-
 function runInQueue<T>(fn: () => Promise<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     const run = () => {
@@ -93,25 +89,4 @@ export function loadCoverTexture(url: string): Promise<THREE.Texture | null> {
 
   pending.set(url, task)
   return task
-}
-
-export async function preloadCoverTextures(
-  urls: string[],
-  batchSize = 10,
-  batchDelayMs = 0,
-): Promise<void> {
-  const unique = [...new Set(urls.filter(Boolean))]
-  for (let i = 0; i < unique.length; i += batchSize) {
-    const batch = unique.slice(i, i + batchSize)
-    await Promise.all(batch.map((u) => loadCoverTexture(u)))
-    if (batchDelayMs > 0 && i + batchSize < unique.length) {
-      await delay(batchDelayMs)
-    }
-  }
-}
-
-export function disposeCoverTextureCache(): void {
-  for (const tex of cache.values()) tex.dispose()
-  cache.clear()
-  pending.clear()
 }

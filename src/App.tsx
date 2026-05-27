@@ -8,12 +8,10 @@ import { ThemeDrawer, ThemeDrawerTrigger } from '@/components/ThemeDrawer'
 import { Timeline } from '@/components/Timeline'
 import { TopBar } from '@/components/TopBar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { loadAnimationNodes } from '@/lib/loadAnimationData'
-import { loadCountryCategories } from '@/lib/loadCountryCategories'
-import {
-  buildThemeDictionaryFromItems,
-  loadThemeItems,
-} from '@/lib/loadThemeDictionary'
+import { fetchCountries } from '@/api/country'
+import { fetchThemes } from '@/api/theme'
+import { loadAnimationNodes } from '@/lib/nodes'
+import { buildThemeDictionary } from '@/lib/themeDictionary'
 import { useAppStore } from '@/store'
 
 function App() {
@@ -39,15 +37,15 @@ function App() {
       setLoadProgress(null)
       try {
         const [countries, themeItems] = await Promise.all([
-          loadCountryCategories(),
-          loadThemeItems(),
+          fetchCountries(),
+          fetchThemes(),
         ])
         if (cancelled) return
 
         setCountryCategories(countries)
         setThemeItems(themeItems)
 
-        const themeDictionary = buildThemeDictionaryFromItems(themeItems)
+        const themeDictionary = buildThemeDictionary(themeItems)
         const nodes = await loadAnimationNodes(
           (loaded, total) => setLoadProgress({ loaded, total }),
           themeDictionary,
@@ -88,8 +86,7 @@ function App() {
                 <p className="text-accent">无法连接后端</p>
                 <p className="max-w-md text-xs leading-relaxed">{loadError}</p>
                 <p className="text-xs opacity-80">
-                  请确认后端已启动（默认 http://127.0.0.1:8110），或设置
-                  VITE_USE_STATIC_DATA=true 使用本地 JSON
+                  请确认后端已启动（默认 http://127.0.0.1:8110）
                 </p>
               </>
             ) : (

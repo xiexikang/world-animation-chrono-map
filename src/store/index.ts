@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
-import { normalizeNodes } from '@/lib/normalizeNode'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { tagThemeOptions } from '@/lib/themeDictionary'
 import type { AnimationNode } from '@/types'
@@ -104,7 +103,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   mobileThemeOpen: false,
 
   setNodes: (nodes) =>
-    set({ allNodes: sortNodesByDate(normalizeNodes(nodes)), nodesLoaded: true }),
+    set({ allNodes: sortNodesByDate(nodes), nodesLoaded: true }),
 
   setThemeItems: (items) =>
     set({

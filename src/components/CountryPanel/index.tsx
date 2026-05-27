@@ -45,6 +45,8 @@ export function CountryPanel() {
   const visibleSet = useVisibleSet()
   const [query, setQuery] = useState('')
   const [listLimit, setListLimit] = useState(PANEL_NODES_PAGE_SIZE)
+  const resetGlobeMarkerLimit = useAppStore((s) => s.resetGlobeMarkerLimit)
+  const setGlobeMarkerLimit = useAppStore((s) => s.setGlobeMarkerLimit)
 
   const selected = countries[0] ?? null
   const q = query.trim().toLowerCase()
@@ -73,7 +75,8 @@ export function CountryPanel() {
 
   useEffect(() => {
     setListLimit(PANEL_NODES_PAGE_SIZE)
-  }, [selected, q, era, themes, searchQuery])
+    resetGlobeMarkerLimit()
+  }, [selected, q, era, themes, searchQuery, resetGlobeMarkerLimit])
 
   const displayNodes = useMemo(
     () => countryNodes.slice(0, listLimit),
@@ -175,13 +178,16 @@ export function CountryPanel() {
                   <button
                     type="button"
                     className="mt-3 w-full rounded-lg border border-white/10 py-2 text-xs text-text-muted transition hover:border-accent/40 hover:text-text"
-                    onClick={() =>
-                      setListLimit((n) =>
-                        Math.min(n + PANEL_NODES_PAGE_SIZE, countryNodes.length),
+                    onClick={() => {
+                      const next = Math.min(
+                        listLimit + PANEL_NODES_PAGE_SIZE,
+                        countryNodes.length,
                       )
-                    }
+                      setListLimit(next)
+                      setGlobeMarkerLimit(next)
+                    }}
                   >
-                    加载更多（已显示 {listLimit} / {countryNodes.length}）
+                    加载更多（已显示 {listLimit} / {countryNodes.length}，地球同步增加标记）
                   </button>
                 )}
               </>

@@ -7,6 +7,10 @@ import {
 } from '@/lib/mergeNodes'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { tagThemeOptions } from '@/lib/themeDictionary'
+import {
+  DEFAULT_GLOBE_MARKERS,
+  MAX_GLOBE_MARKERS_CAP,
+} from '@/constants/performance'
 import type { AnimationNode } from '@/types'
 import type { CountryItem, ThemeItem } from '@/types/api'
 
@@ -18,6 +22,8 @@ export interface AppStore {
   /** 首屏已可交互，仍在拉取或校验剩余数据 */
   nodesSyncing: boolean
   nodesLoadProgress: { loaded: number; total: number | null } | null
+  /** 地球当前展示标记上限（侧栏「加载更多」会同步提高） */
+  globeMarkerLimit: number
 
   countryCategories: CountryItem[]
   countryCategoriesLoaded: boolean
@@ -64,6 +70,8 @@ export interface AppStore {
   setNodesLoadProgress: (
     progress: { loaded: number; total: number | null } | null,
   ) => void
+  setGlobeMarkerLimit: (limit: number) => void
+  resetGlobeMarkerLimit: () => void
   setCountryCategories: (categories: CountryItem[]) => void
   setThemeItems: (items: ThemeItem[]) => void
   setEra: (era: string) => void
@@ -112,6 +120,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   nodesLoaded: false,
   nodesSyncing: false,
   nodesLoadProgress: null,
+  globeMarkerLimit: DEFAULT_GLOBE_MARKERS,
 
   countryCategories: [],
   countryCategoriesLoaded: false,
@@ -151,6 +160,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   setNodesSyncing: (nodesSyncing) => set({ nodesSyncing }),
 
   setNodesLoadProgress: (nodesLoadProgress) => set({ nodesLoadProgress }),
+
+  setGlobeMarkerLimit: (limit) =>
+    set({
+      globeMarkerLimit: Math.min(
+        MAX_GLOBE_MARKERS_CAP,
+        Math.max(DEFAULT_GLOBE_MARKERS, limit),
+      ),
+    }),
+
+  resetGlobeMarkerLimit: () =>
+    set({ globeMarkerLimit: DEFAULT_GLOBE_MARKERS }),
 
   setNodes: (nodes) =>
     set({ allNodes: sortNodesByDate(nodes), nodesLoaded: true }),
@@ -250,6 +270,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       themes: [],
       countries: defaultSelectedCountry(codes),
       searchQuery: '',
+      globeMarkerLimit: DEFAULT_GLOBE_MARKERS,
     })
   },
 

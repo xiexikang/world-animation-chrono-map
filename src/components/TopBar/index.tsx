@@ -1,4 +1,4 @@
-import { MAX_GLOBE_MARKERS } from '@/constants/performance'
+import { MAX_GLOBE_MARKERS_CAP } from '@/constants/performance'
 import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
 import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
@@ -10,9 +10,15 @@ export function TopBar() {
   const total = useAppStore((s) => s.allNodes.length)
   const allNodes = useAppStore((s) => s.allNodes)
   const focusedId = useAppStore((s) => s.focusedId)
+  const globeMarkerLimit = useAppStore((s) => s.globeMarkerLimit)
   const visibleSet = useVisibleSet()
   const visible = visibleSet.size
-  const onGlobe = pickGlobeNodes(allNodes, visibleSet, focusedId).length
+  const onGlobe = pickGlobeNodes(
+    allNodes,
+    visibleSet,
+    focusedId,
+    globeMarkerLimit,
+  ).length
 
   return (
     <>
@@ -28,7 +34,10 @@ export function TopBar() {
       </div>
 
       <p className="hidden shrink-0 text-xs text-text-muted sm:block">
-        共 {total} 部 · 筛选 {visible} 部 · 地球 {onGlobe}/{MAX_GLOBE_MARKERS}
+        共 {total} 部 · 筛选 {visible} 部 · 地球 {onGlobe}/{globeMarkerLimit}
+        {globeMarkerLimit < MAX_GLOBE_MARKERS_CAP && visible > globeMarkerLimit
+          ? `（可加载更多）`
+          : ''}
       </p>
 
       <button

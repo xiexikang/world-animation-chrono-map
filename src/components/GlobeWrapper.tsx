@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { MAX_GLOBE_MARKERS } from '@/constants/performance'
+import { MAX_GLOBE_MARKERS_CAP } from '@/constants/performance'
 import { buildNodeLatLngMap, resolveNodeLatLng } from '@/globe/countryRegions'
 import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
 import type { LatLng } from '@/globe/geo'
@@ -35,6 +35,7 @@ interface GlobeWrapperProps {
 export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
   const visibleSet = useVisibleSet()
   const focusedId = useAppStore((s) => s.focusedId)
+  const globeMarkerLimit = useAppStore((s) => s.globeMarkerLimit)
   const selectedSourceCountries = useAppStore((s) => s.countries)
   const highlightCountries = useMemo(
     () => sourceCountriesToGlobeRegions(selectedSourceCountries),
@@ -48,8 +49,8 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
   const initialCamera = getGlobeCameraPosition(CHINA_GLOBE_CENTER)
 
   const globeNodes = useMemo(
-    () => pickGlobeNodes(nodes, visibleSet, focusedId),
-    [nodes, visibleSet, focusedId],
+    () => pickGlobeNodes(nodes, visibleSet, focusedId, globeMarkerLimit),
+    [nodes, visibleSet, focusedId, globeMarkerLimit],
   )
 
   useEffect(() => {
@@ -192,7 +193,7 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
         <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-text-muted">
           <span>正在布置地球标记…</span>
           <span className="text-xs text-text-muted/70">
-            最多 {MAX_GLOBE_MARKERS} 个海报点
+            最多 {globeMarkerLimit} 个海报点
           </span>
         </div>
       ) : (
@@ -226,9 +227,9 @@ export function GlobeWrapper({ nodes }: GlobeWrapperProps) {
         </Canvas>
       )}
       <p className="pointer-events-none fixed bottom-24 left-1/2 z-10 max-w-[min(90vw,28rem)] -translate-x-1/2 text-center text-xs text-text-muted/80 max-md:bottom-[11rem]">
-        拖拽旋转 · 地球展示热度最高的 {Math.min(globeNodes.length, MAX_GLOBE_MARKERS)} 部
-        {nodes.length > MAX_GLOBE_MARKERS
-          ? `（共 ${nodes.length} 部，完整列表见右侧面板）`
+        拖拽旋转 · 地球展示热度最高的 {globeNodes.length} 部
+        {visibleSet.size > globeMarkerLimit
+          ? `（筛选 ${visibleSet.size} 部，右侧面板加载更多可增至 ${MAX_GLOBE_MARKERS_CAP}）`
           : ''}
       </p>
     </div>

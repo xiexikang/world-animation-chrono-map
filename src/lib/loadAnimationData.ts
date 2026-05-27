@@ -1,10 +1,12 @@
 import animationDataUrl from '@/data/animationData.json?url'
+import { fetchAllAnimeItems, type LoadProgress } from '@/api/anime'
+import { USE_STATIC_DATA } from '@/config'
+import { animeItemsToTmdbRecords } from '@/lib/animeToTmdb'
 import { tmdbRecordsToNodes } from '@/lib/tmdbToNode'
 import type { AnimationNode } from '@/types'
 import type { TmdbAnimeRecord } from '@/types/tmdb'
 
-/** 从 animationData.json（TMDB 原始结构）加载并转为 AnimationNode */
-export async function loadAnimationNodes(): Promise<AnimationNode[]> {
+async function loadStaticTmdbRecords(): Promise<TmdbAnimeRecord[]> {
   const res = await fetch(animationDataUrl)
   if (!res.ok) {
     throw new Error(`无法加载 animationData.json (${res.status})`)
@@ -13,5 +15,19 @@ export async function loadAnimationNodes(): Promise<AnimationNode[]> {
   if (!Array.isArray(raw)) {
     throw new Error('animationData.json 格式无效：应为数组')
   }
-  return tmdbRecordsToNodes(raw)
+  return raw
+}
+
+/** 从后端 API 或本地 JSON 加载并转为 AnimationNode */
+export async function loadAnimationNodes(
+  onProgress?: LoadProgress,
+): Promise<AnimationNode[]> {
+  if (USE_STATIC_DATA) {
+    const raw = await loadStaticTmdbRecords()
+    return tmdbRecordsToNodes(raw)
+  }
+
+  const items = await fetchAllAnimeItems(onProgress)
+  const records = animeItemsToTmdbRecords(items)
+  return tmdbRecordsToNodes(records)
 }

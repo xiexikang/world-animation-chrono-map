@@ -74,8 +74,12 @@ export function tmdbRecordToNode(record: TmdbAnimeRecord): AnimationNode | null 
   const era = eraFromFirstAirDate(record.first_air_date)
   const overview = record.overview?.trim() ?? ''
 
+  const id = record.country_code
+    ? `tmdb-${record.id}-${record.country_code}`
+    : `tmdb-${record.id}`
+
   return {
-    id: `tmdb-${record.id}`,
+    id,
     title,
     titleEn: record.original_name !== record.name ? record.original_name : undefined,
     country: mapCountry(record.origin_country),

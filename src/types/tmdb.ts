@@ -4,6 +4,8 @@ export interface TmdbAnimeRecord {
   backdrop_path: string | null
   genre_ids: number[]
   id: number
+  /** 后端数据源国家码（与 tmdb_id 组成唯一键） */
+  country_code?: string
   origin_country: string[]
   original_language: string
   original_name: string

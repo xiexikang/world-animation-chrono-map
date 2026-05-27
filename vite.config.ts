@@ -36,6 +36,10 @@ export default defineConfig({
     port: 2500,
     allowedHosts: true,
     proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8110',
+        changeOrigin: true,
+      },
       '/cover-proxy': wikiProxyConfig(),
       '/placehold-proxy': {
         target: 'https://placehold.co',

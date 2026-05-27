@@ -3,6 +3,7 @@ import { useVisibleSet } from '@/hooks/useVisibleSet'
 import { canvasEmitter } from '@/lib/emitter'
 import { pickGlobeNodes } from '@/lib/pickGlobeNodes'
 import { useAppStore } from '@/store'
+import { BackgroundLoadIndicator } from './BackgroundLoadIndicator'
 import { SearchBox } from './SearchBox'
 
 export function TopBar() {
@@ -14,6 +15,7 @@ export function TopBar() {
   const onGlobe = pickGlobeNodes(allNodes, visibleSet, focusedId).length
 
   return (
+    <>
     <header className="float-panel fixed top-3 right-3 left-3 z-30 flex h-11 items-center gap-4 px-4 md:left-4 md:right-4">
       <div className="flex shrink-0 items-center gap-2 text-base font-bold text-accent">
         <span aria-hidden>🎬</span>
@@ -50,5 +52,7 @@ export function TopBar() {
         ?
       </button>
     </header>
+    <BackgroundLoadIndicator />
+    </>
   )
 }

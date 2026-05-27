@@ -20,8 +20,17 @@ async function parseJson<T>(res: Response): Promise<T> {
   }
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`)
+export interface ApiRequestOptions {
+  signal?: AbortSignal
+}
+
+export async function apiGet<T>(
+  path: string,
+  options?: ApiRequestOptions,
+): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    signal: options?.signal,
+  })
   if (!res.ok) {
     throw new ApiError(`请求失败 (${res.status})`, res.status)
   }
@@ -32,11 +41,16 @@ export async function apiGet<T>(path: string): Promise<T> {
   return body.data
 }
 
-export async function apiPost<T>(path: string, payload: unknown): Promise<T> {
+export async function apiPost<T>(
+  path: string,
+  payload: unknown,
+  options?: ApiRequestOptions,
+): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+    signal: options?.signal,
   })
   if (!res.ok) {
     throw new ApiError(`请求失败 (${res.status})`, res.status)

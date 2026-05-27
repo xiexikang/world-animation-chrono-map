@@ -35,9 +35,16 @@ pnpm dev
 | 接口 | 用途 |
 |------|------|
 | `POST /api/animes` | 分页拉取动画列表 |
+| `POST /api/animes/meta` | 列表元信息（条数 / 最大更新时间，供本地缓存校验） |
 | `GET /api/countries` | 国家分类 |
 | `GET /api/themes` | 主题字典（`genre_ids` → 中文主题） |
 
 开发环境通过 Vite 将 `/api` 代理到 `http://127.0.0.1:8110`。生产构建在 `.env` 中设置 `VITE_API_BASE_URL` 为后端公网地址。
 
 节点 `country` 字段决定地球上的大致经纬度位置（同国多作品自动分散）。
+
+## 本地缓存
+
+- 按筛选条件（默认含国家码）将列表写入 **IndexedDB**，二次打开先读缓存再请求 `POST /api/animes/meta` 校验
+- 校验通过则不再拉全量；数据变更或超过 24h 则后台重新同步
+- 首屏可交互后，顶部会显示**后台同步**进度条

@@ -1,16 +1,27 @@
 import { create } from 'zustand'
 import { nodeMatchesSourceCountry } from '@/lib/sourceCountry'
+import { replaceCountryNodes, storeHasCountryScope } from '@/lib/mergeNodes'
 import { sortNodesByDate } from '@/lib/sortNodes'
 import { tagThemeOptions } from '@/lib/themeDictionary'
 import type { AnimationNode } from '@/types'
 import type { CountryItem, ThemeItem } from '@/types/api'
 
+export { storeHasCountryScope }
+
 export interface AppStore {
   allNodes: AnimationNode[]
   nodesLoaded: boolean
+  /** 首屏已可交互，仍在拉取或校验剩余数据 */
+  nodesSyncing: boolean
+  nodesLoadProgress: { loaded: number; total: number | null } | null
 
   countryCategories: CountryItem[]
   countryCategoriesLoaded: boolean
+  /** 各国作品总数（来自 /api/countries/stats） */
+  countryStats: Map<string, number>
+  countryStatsLoaded: boolean
+  /** 已从网络/缓存加载完成的国家分片 */
+  loadedCountryScopes: Set<string>
 
   themeItems: ThemeItem[]
   themeTagOptions: string[]
@@ -33,6 +44,20 @@ export interface AppStore {
   mobileThemeOpen: boolean
 
   setNodes: (nodes: AnimationNode[]) => void
+  mergeNodes: (nodes: AnimationNode[]) => void
+  applyCountryNodeBatch: (
+    countryCode: string | undefined,
+    nodes: AnimationNode[],
+    isFirstBatch: boolean,
+  ) => void
+  markCountryScopeLoaded: (scope: string) => void
+  beginNodesLoad: () => void
+  beginCountryLoad: () => void
+  setCountryStats: (stats: Map<string, number>) => void
+  setNodesSyncing: (syncing: boolean) => void
+  setNodesLoadProgress: (
+    progress: { loaded: number; total: number | null } | null,
+  ) => void
   setCountryCategories: (categories: CountryItem[]) => void
   setThemeItems: (items: ThemeItem[]) => void
   setEra: (era: string) => void
@@ -79,9 +104,14 @@ function defaultSelectedCountry(codes: string[]): string[] {
 export const useAppStore = create<AppStore>((set, get) => ({
   allNodes: [],
   nodesLoaded: false,
+  nodesSyncing: false,
+  nodesLoadProgress: null,
 
   countryCategories: [],
   countryCategoriesLoaded: false,
+  countryStats: new Map(),
+  countryStatsLoaded: false,
+  loadedCountryScopes: new Set(),
 
   themeItems: [],
   themeTagOptions: [],
@@ -102,8 +132,49 @@ export const useAppStore = create<AppStore>((set, get) => ({
   aboutOpen: false,
   mobileThemeOpen: false,
 
+  beginNodesLoad: () =>
+    set({ nodesLoaded: false, nodesSyncing: true, nodesLoadProgress: null }),
+
+  beginCountryLoad: () =>
+    set((state) => ({
+      nodesSyncing: true,
+      nodesLoadProgress: null,
+      nodesLoaded: state.allNodes.length > 0 ? state.nodesLoaded : false,
+    })),
+
+  setNodesSyncing: (nodesSyncing) => set({ nodesSyncing }),
+
+  setNodesLoadProgress: (nodesLoadProgress) => set({ nodesLoadProgress }),
+
   setNodes: (nodes) =>
     set({ allNodes: sortNodesByDate(nodes), nodesLoaded: true }),
+
+  mergeNodes: (nodes) =>
+    set((state) => ({
+      allNodes: replaceCountryNodes(state.allNodes, undefined, nodes, true),
+      nodesLoaded: true,
+    })),
+
+  applyCountryNodeBatch: (countryCode, nodes, isFirstBatch) =>
+    set((state) => ({
+      allNodes: replaceCountryNodes(
+        state.allNodes,
+        countryCode,
+        nodes,
+        isFirstBatch,
+      ),
+      nodesLoaded: true,
+    })),
+
+  markCountryScopeLoaded: (scope) =>
+    set((state) => {
+      const next = new Set(state.loadedCountryScopes)
+      next.add(scope)
+      return { loadedCountryScopes: next }
+    }),
+
+  setCountryStats: (countryStats) =>
+    set({ countryStats, countryStatsLoaded: true }),
 
   setThemeItems: (items) =>
     set({

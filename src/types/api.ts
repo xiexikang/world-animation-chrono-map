@@ -35,6 +35,12 @@ export interface AnimeListParams {
   sort_order?: AnimeSortOrder
 }
 
+/** POST /api/animes/meta 响应 */
+export interface AnimeListMeta {
+  total: number
+  max_updated_at: string | null
+}
+
 /** 与后端 ThemeItem 字段一致 */
 export interface ThemeItem {
   tmdb_genre_id: number

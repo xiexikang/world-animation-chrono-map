@@ -1,4 +1,8 @@
-import { fetchAllAnimeItems, type LoadProgress } from '@/api/anime'
+import {
+  fetchAllAnimeItems,
+  type FetchAllAnimeOptions,
+  type LoadProgress,
+} from '@/api/anime'
 import { fetchThemes } from '@/api/theme'
 import {
   buildThemeDictionary,
@@ -7,6 +11,7 @@ import {
 } from '@/lib/themeDictionary'
 import type { AnimeItem } from '@/types/api'
 import type { AnimationNode, CountryCode, EraCode } from '@/types'
+import type { AnimeListParams } from '@/types/api'
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'
 
@@ -105,15 +110,33 @@ export function animeItemsToNodes(
     .filter((node): node is AnimationNode => node !== null)
 }
 
-/** 从后端分页拉取并转为 AnimationNode */
+export interface LoadAnimationNodesOptions {
+  onProgress?: LoadProgress
+  /** 每页转换后的节点，用于首屏先展示 */
+  onBatch?: (nodes: AnimationNode[]) => void
+  signal?: AbortSignal
+  themeDictionary?: ThemeDictionary
+  filters?: Omit<AnimeListParams, 'page' | 'page_size'>
+}
+
+/** 从后端分页拉取并转为 AnimationNode（支持渐进批次） */
 export async function loadAnimationNodes(
-  onProgress?: LoadProgress,
-  themeDictionary?: ThemeDictionary,
-  countryCode?: string,
+  options: LoadAnimationNodesOptions = {},
 ): Promise<AnimationNode[]> {
   const dictionary =
-    themeDictionary ?? buildThemeDictionary(await fetchThemes())
-  const filters = countryCode ? { country_code: countryCode } : {}
-  const items = await fetchAllAnimeItems(onProgress, filters)
+    options.themeDictionary ?? buildThemeDictionary(await fetchThemes())
+
+  const fetchOptions: FetchAllAnimeOptions = {
+    signal: options.signal,
+    filters: options.filters ?? {},
+    onProgress: options.onProgress,
+    onBatch: options.onBatch
+      ? (items) => {
+          options.onBatch?.(animeItemsToNodes(items, dictionary))
+        }
+      : undefined,
+  }
+
+  const items = await fetchAllAnimeItems(fetchOptions)
   return animeItemsToNodes(items, dictionary)
 }

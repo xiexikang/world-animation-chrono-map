@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { COUNTRY_LABELS, eraLabel, themeColor } from '@/constants'
+import { useAnimeDetailNode } from '@/hooks/useAnimeDetailNode'
 import { resolveCoverUrl } from '@/lib/coverUrl'
 import { useAppStore } from '@/store'
 import type { AnimationNode } from '@/types'
@@ -30,14 +31,17 @@ export function DetailCard() {
 }
 
 function DetailCardContent({
-  node,
+  node: seedNode,
   onClose,
 }: {
   node: AnimationNode
   onClose: () => void
 }) {
+  const { node, status } = useAnimeDetailNode(seedNode)
   const [coverFailed, setCoverFailed] = useState(false)
   const country = COUNTRY_LABELS[node.country]
+  const detailLoading = status === 'loading'
+  const detailUnavailable = status === 'not_found' || status === 'error'
 
   useEffect(() => {
     setCoverFailed(false)
@@ -86,9 +90,23 @@ function DetailCardContent({
             </button>
           </div>
 
+          {detailLoading && !node.description?.trim() ? (
+            <p className="text-sm text-text-muted/60" aria-live="polite">
+              正在加载简介…
+            </p>
+          ) : null}
+
           {node.description?.trim() ? (
-            <p className="line-clamp-3 text-sm leading-relaxed text-text-muted">
+            <p
+              className={`line-clamp-3 text-sm leading-relaxed text-text-muted ${detailLoading ? 'opacity-70' : ''}`}
+            >
               {node.description}
+            </p>
+          ) : null}
+
+          {detailUnavailable ? (
+            <p className="text-xs text-text-muted/70">
+              {status === 'not_found' ? '该作品详情不可用' : '详情加载失败，显示列表信息'}
             </p>
           ) : null}
 
@@ -107,7 +125,7 @@ function DetailCardContent({
           </div>
 
           {node.quote?.trim() ? (
-            <blockquote className="line-clamp-2 border-l-2 border-accent pl-2 text-xs italic text-accent">
+            <blockquote className="line-clamp-2 border-l-2 border-accent pl-2 text-xs text-accent">
               「{node.quote}」
             </blockquote>
           ) : null}

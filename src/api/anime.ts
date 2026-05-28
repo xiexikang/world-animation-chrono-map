@@ -23,7 +23,7 @@ export async function fetchAnimePage(
       page: 1,
       page_size: ANIME_PAGE_SIZE,
       fields: LIST_FIELDS,
-      sort_by: 'popularity',
+      sort_by: 'first_air_date',
       sort_order: 'desc',
       ...params,
     },

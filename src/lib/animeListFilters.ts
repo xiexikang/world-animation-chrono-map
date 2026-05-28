@@ -1,7 +1,7 @@
 import type { AnimeListParams } from '@/types/api'
 
 const DEFAULT_SORT = {
-  sort_by: 'popularity' as const,
+  sort_by: 'first_air_date' as const,
   sort_order: 'desc' as const,
 }
 

@@ -1,4 +1,7 @@
 export const GLOBE_RADIUS = 1
+
+/** 地球自转角速度（弧度/秒），约 52 秒一圈 */
+export const EARTH_AUTO_ROTATE_SPEED = 0.12
 export const NODE_SURFACE_OFFSET = 0.026
 
 export interface LatLng {

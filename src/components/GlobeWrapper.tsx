@@ -236,6 +236,7 @@ export function GlobeWrapper() {
             focusedId={focusedId}
             highlightCountries={highlightCountries}
             orbitLimits={orbitLimits}
+            contentReady={geoReady}
           />
         </Suspense>
       </Canvas>

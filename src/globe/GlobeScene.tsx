@@ -1,10 +1,10 @@
 import { Environment, OrbitControls } from '@react-three/drei'
-import { useThree } from '@react-three/fiber'
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import type { PerspectiveCamera } from 'three'
+import { useFrame, useThree } from '@react-three/fiber'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import type { Group, PerspectiveCamera } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { AnimationNode, CountryCode } from '@/types'
-import type { LatLng } from './geo'
+import { EARTH_AUTO_ROTATE_SPEED, type LatLng } from './geo'
 import { CountryOutlines } from './CountryOutlines'
 import { Earth } from './Earth'
 import {
@@ -25,6 +25,8 @@ interface GlobeSceneProps {
   focusedId: string | null
   highlightCountries: CountryCode[]
   orbitLimits?: GlobeOrbitLimits
+  /** 标记经纬度等已就绪（与 GlobeWrapper 的 geoReady 一致） */
+  contentReady?: boolean
 }
 
 export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
@@ -35,11 +37,40 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
       focusedId,
       highlightCountries,
       orbitLimits = DEFAULT_ORBIT_LIMITS,
+      contentReady = false,
     },
     ref,
   ) {
     const controlsRef = useRef<OrbitControlsImpl>(null)
+    const globeRef = useRef<Group>(null)
+    const autoRotatePaused = useRef(false)
+    const canAutoRotate = useRef(false)
+    const resumeRotateTimer = useRef<ReturnType<typeof setTimeout>>()
+    const [earthReady, setEarthReady] = useState(false)
+    const onEarthReady = useCallback(() => setEarthReady(true), [])
     const { camera, scene } = useThree()
+
+    useEffect(() => {
+      canAutoRotate.current = earthReady && contentReady
+    }, [earthReady, contentReady])
+
+    useFrame((_, delta) => {
+      if (
+        !canAutoRotate.current ||
+        autoRotatePaused.current ||
+        !globeRef.current
+      ) {
+        return
+      }
+      globeRef.current.rotation.y += delta * EARTH_AUTO_ROTATE_SPEED
+    })
+
+    useEffect(
+      () => () => {
+        clearTimeout(resumeRotateTimer.current)
+      },
+      [],
+    )
 
     useImperativeHandle(ref, () => ({
       get controls() {
@@ -95,21 +126,23 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
           distance={20}
         />
 
-        <Earth />
-        <CountryOutlines highlightCountries={highlightCountries} />
-        {nodes.map((node) => {
-          const latLng = latLngMap.get(node.id)
-          if (!latLng) return null
-          return (
-            <GlobeNodeMarker
-              key={node.id}
-              node={node}
-              latLng={latLng}
-              visible
-              focused={node.id === focusedId}
-            />
-          )
-        })}
+        <group ref={globeRef}>
+          <Earth onReady={onEarthReady} />
+          <CountryOutlines highlightCountries={highlightCountries} />
+          {nodes.map((node) => {
+            const latLng = latLngMap.get(node.id)
+            if (!latLng) return null
+            return (
+              <GlobeNodeMarker
+                key={node.id}
+                node={node}
+                latLng={latLng}
+                visible
+                focused={node.id === focusedId}
+              />
+            )
+          })}
+        </group>
         <OrbitControls
           ref={controlsRef}
           enablePan={false}
@@ -119,6 +152,16 @@ export const GlobeScene = forwardRef<GlobeSceneHandle, GlobeSceneProps>(
           zoomSpeed={0.85}
           dampingFactor={0.06}
           enableDamping
+          onStart={() => {
+            autoRotatePaused.current = true
+            clearTimeout(resumeRotateTimer.current)
+          }}
+          onEnd={() => {
+            clearTimeout(resumeRotateTimer.current)
+            resumeRotateTimer.current = setTimeout(() => {
+              autoRotatePaused.current = false
+            }, 2500)
+          }}
         />
       </>
     )

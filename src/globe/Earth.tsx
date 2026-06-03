@@ -1,11 +1,9 @@
-import { Suspense, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { MeshTransmissionMaterial, useTexture } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
 import {
   AdditiveBlending,
   BackSide,
   DoubleSide,
-  type Group,
   type Texture,
 } from 'three'
 
@@ -28,16 +26,11 @@ function buildStarPositions(count: number) {
 }
 
 function InnerStarfield() {
-  const ref = useRef<Group>(null)
   const positions = useMemo(() => buildStarPositions(4200), [])
   const accentPositions = useMemo(() => buildStarPositions(1400), [])
 
-  useFrame((state) => {
-    if (ref.current) ref.current.rotation.y = state.clock.elapsedTime * 0.015
-  })
-
   return (
-    <group ref={ref}>
+    <group>
       <points renderOrder={0}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[positions, 3]} />
@@ -89,14 +82,8 @@ function CoreGlow() {
 }
 
 function InnerEarthSurface({ colorMap }: { colorMap: Texture }) {
-  const ref = useRef<Group>(null)
-
-  useFrame((state) => {
-    if (ref.current) ref.current.rotation.y = state.clock.elapsedTime * 0.008
-  })
-
   return (
-    <group ref={ref} scale={0.986}>
+    <group scale={0.986}>
       <mesh renderOrder={1}>
         <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial
@@ -192,8 +179,19 @@ function GlassAtmosphere() {
   )
 }
 
-function EarthWithTexture() {
+function EarthWithTexture({ onReady }: { onReady?: () => void }) {
   const [colorMap] = useTexture([EARTH_MAP])
+
+  useEffect(() => {
+    let cancelled = false
+    const id = requestAnimationFrame(() => {
+      if (!cancelled) onReady?.()
+    })
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(id)
+    }
+  }, [colorMap, onReady])
 
   return (
     <group>
@@ -206,10 +204,10 @@ function EarthWithTexture() {
   )
 }
 
-export function Earth() {
+export function Earth({ onReady }: { onReady?: () => void }) {
   return (
     <Suspense fallback={null}>
-      <EarthWithTexture />
+      <EarthWithTexture onReady={onReady} />
     </Suspense>
   )
 }

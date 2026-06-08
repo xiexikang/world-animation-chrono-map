@@ -2,6 +2,10 @@
 
 可 **拖拽旋转** 的 3D 世界地球，动画节点按出品国家落在对应地理位置。
 
+
+## 体验地址
+https://world-animation-chrono-map-web.xiexk.cn/
+
 ## 技术栈
 
 | 层级 | 选型 |

@@ -12,7 +12,7 @@
 .
 ├─ src/          # 前端（Vite + React + TypeScript）
 ├─ public/
-├─ backend/      # 后端（FastAPI + MySQL）
+├─ backend/      # 后端（Python + FastAPI + MySQL）
 └─ docs/
 ```
 
@@ -25,7 +25,7 @@
 | 前端框架 | React 18.x |
 | 3D | Three.js + React Three Fiber + Drei |
 | 状态 | Zustand 5.x |
-| 后端 | FastAPI |
+| 后端 | Python + FastAPI |
 | 数据库 | MySQL 8.x |
 
 ## 本地开发

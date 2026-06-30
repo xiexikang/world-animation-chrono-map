@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "pnpm dev:frontend",
+    "dev:frontend": "vite",
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port 8110 --reload",
+    "dev:all": "concurrently -k -n frontend,backend -c cyan,green \"pnpm dev:frontend\" \"pnpm dev:backend\"",
+    "setup:dev": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-dev.ps1",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -35,6 +39,7 @@
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
